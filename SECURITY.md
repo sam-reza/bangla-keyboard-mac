@@ -25,7 +25,7 @@ attack surface:
 
 ### Injection‑safe privileged execution
 
-The `Setup.command` never interpolates a path directly into a privileged shell
+The installer app never interpolates a path directly into a privileged shell
 string. Paths are passed as `osascript` arguments and quoted by AppleScript
 itself:
 
