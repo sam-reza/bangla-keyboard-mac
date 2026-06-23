@@ -85,6 +85,17 @@ Releases page. Right-click it -> Open -> Open  (no Settings step needed).
 
 
 ------------------------------------------------------------
+------------------------------------------------------------
+TYPING TIP - Bangla Classic (ও-কার / এ-কার)
+------------------------------------------------------------
+Type the consonant FIRST, then the vowel sign - NO space:
+   স then ে        -> সে
+   স then ে then া -> সো
+   ত then ে then া -> তো
+This keeps Space as a clean word-gap, so words no longer stick
+together.  (Older builds used Space to make these - just drop it.)
+
+
 Why the warning?  Because the app is not notarized by Apple. The source
 code is public on GitHub, so you can verify it yourself. Thank you!  -  BiswasHost
 ============================================================

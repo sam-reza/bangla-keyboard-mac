@@ -85,6 +85,19 @@ select that font in your app.
 The **Bangla Unicode** layout has no such requirement — it works with any of the
 bundled Unicode fonts (or system Bangla fonts).
 
+### Typing ও‑কার / এ‑কার / ঐ‑কার in Classic (v1.1.0+)
+
+Type the consonant **first**, then the vowel sign — **no space needed**:
+
+- `স` then `ে` → **সে**, &nbsp; `স` then `ে` then `া` → **সো**, &nbsp; `ত` then `ে` then `া` → **তো**
+- This is the natural (Windows‑style) order, and it means **Space is always a clean
+  word‑separator** — so words like *আমার সোনার বাংলা* no longer stick together.
+
+> Earlier builds used a leading **Space** to trigger the left‑side vowel; that
+> accidentally ate the gap between words. If you used the old space habit, just
+> drop the space. **After updating, remove and re‑add the Classic layout, then log
+> out/in** — macOS caches keyboard layouts.
+
 ## Licensing — please read
 
 - **This installer, the build scripts, the icons, and the keyboard-layout
