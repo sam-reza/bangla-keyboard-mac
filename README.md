@@ -42,22 +42,37 @@ Big white glyph = normal key; small red glyph = **Shift**. `◌` marks a vowel-s
 
 ## Install
 
-Download the **`.dmg`** from [Releases](../../releases) and open it, then:
+This build is **not code-signed** (no paid Apple Developer ID), so macOS
+Gatekeeper will block a plain double-click. Pick whichever is easier:
 
-1. Double-click **`Bangla Keyboard Installer`**. *(First time: right-click it →
-   **Open** → **Open**, since it is not code-signed.)*
-2. It detects whether the keyboard is already installed and offers
-   **Install**, or **Reinstall / Uninstall**. Choose one and enter your admin
-   password when asked.
-3. **Log out and log back in** (or restart) — macOS caches keyboard layouts, so
-   they only appear after a fresh login session.
-4. **System Settings → Keyboard → Text Input → Edit… → `+` → Bangla** and add
+### ✅ Easiest — the installer package (`.pkg`)
+1. From [**Releases**](../../releases) download **`Bangla Keyboard.pkg`**.
+2. **Right-click it → Open → Open** (a normal double-click is blocked).
+3. Follow the installer and enter your admin password.
+
+### Or — the installer app (adds Reinstall / Uninstall)
+1. From [**Releases**](../../releases) download the **`.dmg`** and open it.
+2. Try to open **`Bangla Keyboard Installer`** once → macOS blocks it.
+3. **System Settings → Privacy & Security**, scroll down, click **"Open Anyway"**,
+   then open the app again. It offers **Install / Reinstall / Uninstall**.
+
+### After installing (either way)
+1. **Log out and log back in** (or restart) — macOS caches keyboard layouts.
+2. **System Settings → Keyboard → Text Input → Edit… → `+` → Bangla** → add
    **Bangla Unicode** and/or **Bangla Classic**.
-5. Switch input with the menu-bar flag icon or **Control-Space**.
+3. Switch input with the menu-bar flag icon or **Control-Space**.
 
-> Prefer the plain installer? A standalone **`Bangla Keyboard.pkg`** is also
-> provided (right-click → Open). Note: the `.pkg` is the standard macOS
-> installer (Install only); use the **Installer app** for Reinstall/Uninstall.
+### "App is damaged and can't be opened"?
+That's **Gatekeeper on an unsigned download — not real damage** (common on Apple
+Silicon). Easiest fix: **use the `.pkg`** above. If you prefer the app, drag it
+out of the disk image to (say) your Desktop, then in **Terminal** run:
+
+```bash
+xattr -dr com.apple.quarantine ~/Desktop/"Bangla Keyboard Installer.app"
+```
+
+…and open it. (This warning goes away entirely only with a notarized build,
+which needs a paid Apple Developer ID.)
 
 ## ⚠️ About the Bangla Classic layout (SutonnyMJ)
 

@@ -46,6 +46,12 @@ $PB -c "Set :CFBundleName 'Bangla Keyboard Installer'" "$PL" 2>/dev/null || true
 $PB -c "Add :CFBundleShortVersionString string $VERSION" "$PL" 2>/dev/null || $PB -c "Set :CFBundleShortVersionString $VERSION" "$PL" 2>/dev/null || true
 $PB -c "Add :LSMinimumSystemVersion string 11.0" "$PL" 2>/dev/null || true
 $PB -c "Add :NSHumanReadableCopyright string 'BiswasHost - https://www.biswashost.com'" "$PL" 2>/dev/null || true
+# Re-sign ad-hoc AFTER all bundle edits — osacompile's signature is invalidated
+# by embedding the pkg / icon / Info.plist edits, which makes a downloaded
+# (quarantined) copy read as "damaged" on Apple Silicon. A valid ad-hoc sig
+# turns that into the normal "unidentified developer" (Open Anyway) flow.
+codesign --force --deep --sign - "$APP"
+codesign --verify --deep "$APP" || { echo "codesign verify FAILED"; exit 1; }
 touch "$APP"
 cp -R "$APP" "$DIST/"   # also drop the app in dist/ for direct use
 
