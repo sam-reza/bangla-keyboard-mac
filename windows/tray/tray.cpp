@@ -49,6 +49,9 @@ static NOTIFYICONDATAW g_nid    = {};
 static HICON           g_icoUni = nullptr; // অ on flag-red circle
 static HICON           g_icoCls = nullptr; // ক on brick-red circle
 static HICON           g_icoEn  = nullptr; // E on grey circle
+static HBITMAP         g_bmpUni = nullptr; // 16x16 versions for the popup menu
+static HBITMAP         g_bmpCls = nullptr;
+static HBITMAP         g_bmpEn  = nullptr;
 
 #define WM_TRAY     (WM_APP + 1)
 #define ID_UNICODE  1001
@@ -160,6 +163,33 @@ static HICON makeIcon(const wchar_t* txt, COLORREF circle) {
     return ic;
 }
 
+// Same flag-style art as the tray icon, drawn into a 16x16 HBITMAP for the popup
+// menu (menus take a bitmap via MIIM_BITMAP, not an HICON).
+static HBITMAP makeMenuBitmap(const wchar_t* txt, COLORREF circle) {
+    const int sz = 16;
+    HDC sdc = GetDC(nullptr);
+    HDC dc  = CreateCompatibleDC(sdc);
+    HBITMAP bmp = CreateCompatibleBitmap(sdc, sz, sz);
+    HGDIOBJ ob = SelectObject(dc, bmp);
+    RECT r = {0, 0, sz, sz};
+    HBRUSH green = CreateSolidBrush(RGB(0, 106, 78));
+    FillRect(dc, &r, green); DeleteObject(green);
+    HBRUSH cb = CreateSolidBrush(circle);
+    HGDIOBJ ob2 = SelectObject(dc, cb);
+    HGDIOBJ op  = SelectObject(dc, GetStockObject(NULL_PEN));
+    Ellipse(dc, 1, 1, sz - 1, sz - 1);
+    SelectObject(dc, op); SelectObject(dc, ob2); DeleteObject(cb);
+    SetBkMode(dc, TRANSPARENT); SetTextColor(dc, RGB(255, 255, 255));
+    HFONT f = CreateFontW(13, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
+                          OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH, L"Nirmala UI");
+    HGDIOBJ of = SelectObject(dc, f);
+    DrawTextW(dc, txt, -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    SelectObject(dc, of); DeleteObject(f);
+    SelectObject(dc, ob); DeleteDC(dc); ReleaseDC(nullptr, sdc);
+    return bmp;
+}
+
 static const wchar_t* modeTip() {
     switch (g_mode) {
         case MODE_UNICODE: return L"Bangla Keyboard — Bangla Unicode  (Ctrl+Alt+B = English)";
@@ -203,6 +233,14 @@ static void showMenu() {
     AppendMenuW(m, MF_STRING | (g_mode == MODE_UNICODE ? MF_CHECKED : 0), ID_UNICODE, L"Bangla Unicode");
     AppendMenuW(m, MF_STRING | (g_mode == MODE_CLASSIC ? MF_CHECKED : 0), ID_CLASSIC, L"Bangla Classic");
     AppendMenuW(m, MF_STRING | (g_mode == MODE_ENGLISH ? MF_CHECKED : 0), ID_ENGLISH, L"English");
+    // colored flag icon before each mode name (like the tray icon)
+    auto setBmp = [&](UINT id, HBITMAP b) {
+        MENUITEMINFOW mii = {}; mii.cbSize = sizeof(mii); mii.fMask = MIIM_BITMAP; mii.hbmpItem = b;
+        SetMenuItemInfoW(m, id, FALSE, &mii);
+    };
+    setBmp(ID_UNICODE, g_bmpUni);
+    setBmp(ID_CLASSIC, g_bmpCls);
+    setBmp(ID_ENGLISH, g_bmpEn);
     AppendMenuW(m, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(m, MF_STRING, ID_ABOUT, L"About");
     AppendMenuW(m, MF_STRING, ID_EXIT, L"Close");
@@ -266,6 +304,9 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_icoUni = makeIcon(L"অ", RGB(244, 42, 65));   // flag red
     g_icoCls = makeIcon(L"ক", RGB(192, 57, 43));   // brick red
     g_icoEn  = makeIcon(L"E", RGB(127, 140, 141)); // grey
+    g_bmpUni = makeMenuBitmap(L"অ", RGB(244, 42, 65));
+    g_bmpCls = makeMenuBitmap(L"ক", RGB(192, 57, 43));
+    g_bmpEn  = makeMenuBitmap(L"E", RGB(127, 140, 141));
 
     g_nid.cbSize = sizeof(g_nid);
     g_nid.hWnd   = g_hWnd;
@@ -289,6 +330,9 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     if (g_icoUni) DestroyIcon(g_icoUni);
     if (g_icoCls) DestroyIcon(g_icoCls);
     if (g_icoEn)  DestroyIcon(g_icoEn);
+    if (g_bmpUni) DeleteObject(g_bmpUni);
+    if (g_bmpCls) DeleteObject(g_bmpCls);
+    if (g_bmpEn)  DeleteObject(g_bmpEn);
     if (once) { ReleaseMutex(once); CloseHandle(once); }
     return 0;
 }
