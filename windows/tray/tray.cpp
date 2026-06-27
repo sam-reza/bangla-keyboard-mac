@@ -115,9 +115,20 @@ static LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam) {
             bool win   = down(VK_LWIN) || down(VK_RWIN);
             bool shift = down(VK_SHIFT);
             unsigned scan = k->scanCode;
+            DWORD vk = k->vkCode;
             KLEngine* eng = currentEngine();
 
-            if (ctrl || alt || win) {
+            // A modifier key pressed on its OWN (Shift/Ctrl/Alt/Win/Caps) must NOT
+            // flush — otherwise pressing Shift before a shifted letter (e.g. ছ) would
+            // commit a pending prebase vowel before it can reorder (ে + ছ -> ছে).
+            bool isModifier = vk == VK_SHIFT  || vk == VK_LSHIFT   || vk == VK_RSHIFT
+                           || vk == VK_CONTROL || vk == VK_LCONTROL || vk == VK_RCONTROL
+                           || vk == VK_MENU    || vk == VK_LMENU    || vk == VK_RMENU
+                           || vk == VK_LWIN    || vk == VK_RWIN     || vk == VK_CAPITAL;
+
+            if (isModifier) {
+                /* pass through, keep the pending deadkey */
+            } else if (ctrl || alt || win) {
                 flushCurrent();                               // let the shortcut through
             } else if (eng->wouldHandle(scan)) {
                 applyKey(eng, scan, shift);                   // immediate live preview
