@@ -1,19 +1,22 @@
-# Bangla Keyboard — tray switcher (Bijoy-style)
+# Bangla Keyboard — tray switcher
 
 `bangla-tray.exe` is a standalone background app with a **system-tray icon + popup
-menu** (Unicode / Bijoy Classic / English) — the same switch-from-the-tray UX as
-classic Bijoy, with the **same two layouts the macOS build ships**. It does **not**
-need the TSF IME, registration, or admin: just run the .exe.
+menu** (Bangla Unicode / Bangla Classic / English) — the same two layouts the
+macOS build ships, switchable from the tray. It does **not** need the TSF IME,
+registration, or admin: just run the .exe.
 
 ## The three modes
-- **Unicode** (green **অ**) — standard Unicode Bangla, works with any Bangla font.
-  Uses the reordering engine ([`../engine/engine.*`](../engine/)).
-- **Bijoy Classic** (blue **ক**) — the legacy **SutonnyMJ / Bijoy ASCII** encoding,
-  byte-identical to the macOS Classic layout. Run through the Classic FSM
+- **Bangla Unicode** (অ on a red circle) — standard Unicode Bangla, works with any
+  Bangla font. Uses the reordering engine ([`../engine/engine.*`](../engine/)).
+- **Bangla Classic** (ক on a brick-red circle) — the **legacy ANSI Bangla**
+  encoding, byte-identical to the macOS Classic layout. Run through the Classic FSM
   ([`../engine/classic.*`](../engine/), generated from the Mac `.keylayout`).
-  ⚠️ Renders as Bangla **only in the SutonnyMJ font** (or another Bijoy ASCII font)
-  — set your document/app font to SutonnyMJ. We don't bundle it (commercial font).
-- **English** (red **E**) — passthrough.
+  ⚠️ Renders as Bangla **only in a legacy ANSI Bangla font** (the kind used for old
+  documents) — set your document/app font to one. We don't bundle one (commercial).
+- **English** (E on a grey circle) — passthrough.
+
+The tray icons match the macOS build: a green square (Bangladesh-flag green) + a
+coloured circle + a white Bangla letter.
 
 ## How it works
 - Switch with: **left-click the tray icon** (toggles English ⇄ last Bangla mode),
@@ -24,7 +27,7 @@ need the TSF IME, registration, or admin: just run the .exe.
   - Unicode reorders (prebase vowel, reph), so it injects by back-spacing the live
     syllable and retyping.
   - Classic is visual-order, so injection is **append-only** (more robust).
-- Same fixed (Bijoy-style) key layout as the rest of the project / the Mac build.
+- Same fixed key layout as the rest of the project / the Mac build.
 
 ## Run it
 1. Build (see [`../build-all.bat`](../build-all.bat)) → `../dist/bangla-tray.exe`.
@@ -42,16 +45,16 @@ To start it automatically at login, drop a shortcut to `bangla-tray.exe` in
 | Switch | tray icon / Ctrl+Alt+B | Win+Space (Windows switcher) |
 | Works in | every app (global hook + inject) | every TSF-aware app (composition) |
 | Robustness | edits text by injecting backspaces — can be off in apps with grapheme-cluster backspace, password boxes, or some games | proper IME composition; the "correct" Windows way |
-| Feel | exactly like classic Bijoy | like a built-in Windows language |
+| Modes | Unicode + Classic + English | Unicode (Classic could be added) |
 
 Both share the **same engine**, so typing behaviour matches. Use the tray app for
-the Bijoy-style experience; use the IME for the most robust integration.
+the switch-from-the-tray experience; use the IME for the most robust integration.
 
 ## Limitations / TODO
-- **Classic needs the SutonnyMJ font** to render (we can't bundle it). Without it
-  the text shows as Latin/symbol characters (the raw Bijoy ASCII), same as on Mac.
-- Unicode injection (backspace-diff) can misbehave in apps that delete by grapheme cluster,
-  in password fields, or in some full-screen games. The TSF IME avoids this.
+- **Classic needs a legacy ANSI Bangla font** to render (we can't bundle one).
+  Without it the text shows as Latin/symbol characters, same as on Mac.
+- Unicode injection (backspace-diff) can misbehave in apps that delete by grapheme
+  cluster, in password fields, or in some full-screen games. The TSF IME avoids this.
 - x64 only — a global hook works across all apps regardless of their bitness, so no
   separate 32-bit build is needed.
 - Unsigned — code-sign before distributing (a keyboard hook + unsigned exe will

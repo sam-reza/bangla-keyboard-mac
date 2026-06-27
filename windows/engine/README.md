@@ -26,9 +26,9 @@ build-and-test.bat              :: just the C++ test (MSVC 'cl' or MinGW 'g++')
 `demo.cpp` → `bangla-demo.exe` is a standalone runnable demo of this same engine:
 type on a US-QWERTY keyboard and watch live Bangla (`--keys "c j f"` for batch).
 
-## Bangla Classic (SutonnyMJ / Bijoy ASCII)
+## Bangla Classic (legacy ANSI Bangla)
 `classic.h` / `classic.cpp` + `classic_table.h` are the **Classic** layout (the
-legacy SutonnyMJ encoding, same as the macOS Classic `.keylayout`). Classic is a
+legacy ANSI Bangla encoding, same as the macOS Classic `.keylayout`). Classic is a
 fully-deferred deadkey machine, so instead of hand-porting it we **run its FSM**:
 - `keylayout_interp.py` — a faithful interpreter of Apple `.keylayout` deadkey
   machines. Cross-validated by running it on the *Unicode* `.keylayout` against the
@@ -39,8 +39,8 @@ fully-deferred deadkey machine, so instead of hand-porting it we **run its FSM**
 - `gen_classic_test.py` → `classic_test.cpp` — bakes ground-truth outputs from the
   interpreter; the C++ `ClassicEngine` passes **19/19** against them.
 
-Classic output is the legacy encoding (renders as Bangla only in the SutonnyMJ
-font), so it's append-only (visual order, no reordering). Regenerate after any
+Classic output is the legacy encoding (renders as Bangla only in a legacy ANSI
+Bangla font), so it's append-only (visual order, no reordering). Regenerate after any
 `.keylayout` change: `python gen_classic.py && python gen_classic_test.py`.
 
 ## Design notes carried over from the spec

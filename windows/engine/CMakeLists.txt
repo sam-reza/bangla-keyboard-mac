@@ -17,7 +17,7 @@ endif()
 add_executable(enginetest test.cpp)
 target_link_libraries(enginetest PRIVATE bangla_engine)
 
-add_executable(classictest classic_test.cpp)   # Bangla Classic (SutonnyMJ) FSM
+add_executable(classictest classic_test.cpp)   # Bangla Classic (legacy ANSI) FSM
 target_link_libraries(classictest PRIVATE bangla_engine)
 add_test(NAME classic_corpus COMMAND classictest)
 

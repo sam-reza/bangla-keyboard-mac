@@ -90,7 +90,7 @@ class Engine:
         if unit == HASANTA:
             self.cons += unit; return ("compose", self.render())
         if unit in CLUSTERMODS:
-            # Reph (র্) is typed AFTER its consonant (Bijoy/Windows habit) but in
+            # Reph (র্) is typed AFTER its consonant (fixed-layout/Windows habit) but in
             # Unicode it leads the cluster, so reorder it to the front of a closed
             # consonant: ক then র্ -> র্ক (macOS .keylayout ground truth: state "ka"
             # + reph -> "র্ক"). Folas (্র ্য) genuinely follow, so they append.

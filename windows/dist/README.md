@@ -6,8 +6,8 @@ The binaries themselves are git-ignored (rebuild them locally); this folder hold
 | artifact | what it is | how to use |
 |---|---|---|
 | `enginetest.exe` | the SPEC §7 corpus test | double-click / run → expect **13/13 passed** |
-| **`bangla-tray.exe`** | **Bijoy-style tray switcher** — the easiest way to actually use it | double-click → a tray icon appears. Right-click → pick **Unicode / Bijoy Classic / English** (same two layouts as Mac). **Ctrl+Alt+B** or left-click toggles Bangla⇄English, then type in **any** app. No admin, no install. Classic needs the **SutonnyMJ** font. See [`../tray/`](../tray/) |
-| `classictest.exe` | Classic (SutonnyMJ) FSM test | run → expect **19/19 passed** |
+| **`bangla-tray.exe`** | **tray switcher** — the easiest way to actually use it | double-click → a tray icon appears. Right-click → pick **Bangla Unicode / Bangla Classic / English** (same two layouts as Mac). **Ctrl+Alt+B** or left-click toggles Bangla⇄English, then type in **any** app. No admin, no install. Classic needs a **legacy ANSI Bangla font**. See [`../tray/`](../tray/) |
+| `classictest.exe` | Classic (legacy ANSI) FSM test | run → expect **19/19 passed** |
 | `bangla-demo.exe` | standalone typing demo (not the IME) | run it, type on your US-QWERTY keyboard, watch live Bangla. `[ ]` marks the composing syllable. **Enter** = new line, **Esc** = quit. Batch mode: `bangla-demo.exe --keys "c j f"` → `কো` |
 | `BanglaKeyboard.dll` | **the IME (x64)** — a TSF text service for 64-bit apps | register it (below), then switch to it with **Win+Space** in any app |
 | `BanglaKeyboard32.dll` | **the IME (x86)** — same thing for 32-bit apps (loaded under WOW64) | registered alongside the x64 one; same CLSID |

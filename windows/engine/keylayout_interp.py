@@ -1,6 +1,6 @@
 # Faithful interpreter for Apple .keylayout deadkey state machines.
 # Used to (a) cross-validate against the Unicode SPEC corpus and (b) extract the
-# Bangla Classic (SutonnyMJ/Bijoy ASCII) mapping for the Windows port. The Classic
+# Bangla Classic (legacy ANSI Bangla) mapping for the Windows port. The Classic
 # layout is a fully-deferred deadkey machine, so rather than hand-port it we run
 # its own FSM — same algorithm UCKeyTranslate uses — which guarantees Mac parity.
 import xml.etree.ElementTree as ET

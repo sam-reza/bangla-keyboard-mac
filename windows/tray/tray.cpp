@@ -1,17 +1,18 @@
-// Bangla Keyboard — Bijoy-style tray switcher (standalone, no IME registration).
+// Bangla Keyboard — tray switcher (standalone, no IME registration).
 //
-// A background app with a system-tray icon + popup menu (Unicode / Classic /
-// English), exactly like the classic Bijoy switcher. A global low-level keyboard
-// hook runs each keystroke through the shared engines and injects the result with
-// SendInput, so it types Bangla in ANY app without registering a TSF IME or admin.
+// A background app with a system-tray icon + popup menu (Bangla Unicode /
+// Bangla Classic / English). A global low-level keyboard hook runs each keystroke
+// through the shared engines and injects the result with SendInput, so it types
+// Bangla in ANY app without registering a TSF IME or admin.
 //
-//   Unicode  — standard Unicode Bangla (../engine/engine.*). Reorders a prebase
-//              vowel / reph, so it injects by back-spacing the live syllable and
-//              retyping (one backspace == one code point in most editors).
-//   Classic  — legacy SutonnyMJ / Bijoy ASCII (../engine/classic.*). Visual order,
-//              so injection is append-only (robust). Needs the SutonnyMJ font to
-//              render as Bangla.
-//   English  — passthrough.
+//   Bangla Unicode  — standard Unicode Bangla (../engine/engine.*). Reorders a
+//                     prebase vowel / reph, so it injects by back-spacing the live
+//                     syllable and retyping (one backspace == one code point).
+//   Bangla Classic  — legacy ANSI Bangla encoding (../engine/classic.*), matching
+//                     the macOS Classic layout. Visual order, so injection is
+//                     append-only (robust). Renders as Bangla only in a legacy
+//                     ANSI Bangla font (the one used for old documents).
+//   English         — passthrough.
 //
 // Switch with the tray menu, a left-click on the icon, or Ctrl+Alt+B (toggles
 // English <-> the last Bangla mode).
@@ -39,15 +40,15 @@ static HINSTANCE       g_hInst;
 static HWND            g_hWnd;
 static HHOOK           g_hook;
 static Engine          g_uni;              // Unicode engine
-static ClassicEngine   g_classic;          // Classic (SutonnyMJ) engine
+static ClassicEngine   g_classic;          // Classic engine
 static Str             g_shown;            // Unicode mode: current on-screen syllable
 static Mode            g_mode = MODE_ENGLISH;
 static Mode            g_lastBangla = MODE_UNICODE;  // what Ctrl+Alt+B / click returns to
 static bool            g_classicHintShown = false;
 static NOTIFYICONDATAW g_nid    = {};
-static HICON           g_icoUni = nullptr; // green অ
-static HICON           g_icoCls = nullptr; // blue  ক
-static HICON           g_icoEn  = nullptr; // red   E
+static HICON           g_icoUni = nullptr; // অ on flag-red circle
+static HICON           g_icoCls = nullptr; // ক on brick-red circle
+static HICON           g_icoEn  = nullptr; // E on grey circle
 
 #define WM_TRAY     (WM_APP + 1)
 #define ID_UNICODE  1001
@@ -128,17 +129,25 @@ static LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam) {
 }
 
 // ---- tray icon / menu ------------------------------------------------------
-static HICON makeIcon(const wchar_t* txt, COLORREF bg, COLORREF fg) {
+// Flag-style icon: green square + colored circle + white Bangla letter (matches
+// the macOS icons). The circle colour tells the modes apart.
+static HICON makeIcon(const wchar_t* txt, COLORREF circle) {
     const int sz = 32;
     HDC sdc = GetDC(nullptr);
     HDC dc  = CreateCompatibleDC(sdc);
     HBITMAP color = CreateCompatibleBitmap(sdc, sz, sz);
-    HBITMAP mask  = CreateBitmap(sz, sz, 1, 1, nullptr);
+    HBITMAP mask  = CreateBitmap(sz, sz, 1, 1, nullptr);   // all-0 = fully opaque
     HGDIOBJ ob = SelectObject(dc, color);
     RECT r = {0, 0, sz, sz};
-    HBRUSH b = CreateSolidBrush(bg); FillRect(dc, &r, b); DeleteObject(b);
-    SetBkMode(dc, TRANSPARENT); SetTextColor(dc, fg);
-    HFONT f = CreateFontW(26, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
+    HBRUSH green = CreateSolidBrush(RGB(0, 106, 78));      // Bangladesh-flag green
+    FillRect(dc, &r, green); DeleteObject(green);
+    HBRUSH cb = CreateSolidBrush(circle);                  // red / brick / grey circle
+    HGDIOBJ ob2 = SelectObject(dc, cb);
+    HGDIOBJ op  = SelectObject(dc, GetStockObject(NULL_PEN));
+    Ellipse(dc, 3, 3, sz - 3, sz - 3);
+    SelectObject(dc, op); SelectObject(dc, ob2); DeleteObject(cb);
+    SetBkMode(dc, TRANSPARENT); SetTextColor(dc, RGB(255, 255, 255));
+    HFONT f = CreateFontW(22, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
                           OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
                           DEFAULT_PITCH, L"Nirmala UI");
     HGDIOBJ of = SelectObject(dc, f);
@@ -153,8 +162,8 @@ static HICON makeIcon(const wchar_t* txt, COLORREF bg, COLORREF fg) {
 
 static const wchar_t* modeTip() {
     switch (g_mode) {
-        case MODE_UNICODE: return L"Bangla Keyboard — Unicode  (Ctrl+Alt+B = English)";
-        case MODE_CLASSIC: return L"Bangla Keyboard — Classic/SutonnyMJ  (Ctrl+Alt+B = English)";
+        case MODE_UNICODE: return L"Bangla Keyboard — Bangla Unicode  (Ctrl+Alt+B = English)";
+        case MODE_CLASSIC: return L"Bangla Keyboard — Bangla Classic  (Ctrl+Alt+B = English)";
         default:           return L"Bangla Keyboard — English  (Ctrl+Alt+B = Bangla)";
     }
 }
@@ -182,8 +191,8 @@ static void setMode(Mode m) {
     updateTray();
     if (m == MODE_CLASSIC && !g_classicHintShown) {
         g_classicHintShown = true;
-        balloon(L"Classic (SutonnyMJ) mode",
-                L"Set your font to SutonnyMJ (or another Bijoy ASCII font) to see Bangla.");
+        balloon(L"Bangla Classic mode",
+                L"Set your app/document font to a legacy ANSI Bangla font to see Bangla.");
     }
 }
 static void toggleEnglish() { setMode(g_mode == MODE_ENGLISH ? g_lastBangla : MODE_ENGLISH); }
@@ -191,8 +200,8 @@ static void toggleEnglish() { setMode(g_mode == MODE_ENGLISH ? g_lastBangla : MO
 static void showMenu() {
     POINT pt; GetCursorPos(&pt);
     HMENU m = CreatePopupMenu();
-    AppendMenuW(m, MF_STRING | (g_mode == MODE_UNICODE ? MF_CHECKED : 0), ID_UNICODE, L"Unicode");
-    AppendMenuW(m, MF_STRING | (g_mode == MODE_CLASSIC ? MF_CHECKED : 0), ID_CLASSIC, L"Bijoy Classic (SutonnyMJ)");
+    AppendMenuW(m, MF_STRING | (g_mode == MODE_UNICODE ? MF_CHECKED : 0), ID_UNICODE, L"Bangla Unicode");
+    AppendMenuW(m, MF_STRING | (g_mode == MODE_CLASSIC ? MF_CHECKED : 0), ID_CLASSIC, L"Bangla Classic");
     AppendMenuW(m, MF_STRING | (g_mode == MODE_ENGLISH ? MF_CHECKED : 0), ID_ENGLISH, L"English");
     AppendMenuW(m, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(m, MF_STRING, ID_ABOUT, L"About");
@@ -216,12 +225,12 @@ static LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
                 case ID_ABOUT:
                     MessageBoxW(h,
                         L"Bangla Keyboard — tray switcher\n\n"
-                        L"Unicode = standard Unicode Bangla (any Bangla font).\n"
-                        L"Bijoy Classic = legacy SutonnyMJ/Bijoy ASCII (needs the SutonnyMJ font).\n"
+                        L"Bangla Unicode = standard Unicode Bangla (any Bangla font).\n"
+                        L"Bangla Classic = legacy ANSI Bangla encoding (needs a legacy ANSI Bangla font).\n"
                         L"English = normal typing.\n\n"
                         L"Switch: click the tray icon, this menu, or Ctrl+Alt+B.\n"
-                        L"Same fixed (Bijoy-style) layout as the macOS build.\n"
-                        L"MIT licensed. No Bijoy trademark; emits standard Unicode / legacy ASCII.",
+                        L"Same fixed layout as the macOS build.\n"
+                        L"MIT licensed.",
                         L"About Bangla Keyboard", MB_OK | MB_ICONINFORMATION);
                     break;
                 case ID_EXIT: DestroyWindow(h); break;
@@ -254,9 +263,9 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_hWnd = CreateWindowW(wc.lpszClassName, L"Bangla Keyboard", 0, 0, 0, 0, 0,
                            HWND_MESSAGE, nullptr, hInst, nullptr);
 
-    g_icoUni = makeIcon(L"অ", RGB(34, 153, 84),  RGB(255, 255, 255)); // green
-    g_icoCls = makeIcon(L"ক", RGB(37, 99, 235),   RGB(255, 255, 255)); // blue
-    g_icoEn  = makeIcon(L"E", RGB(192, 57, 43),    RGB(255, 255, 255)); // red
+    g_icoUni = makeIcon(L"অ", RGB(244, 42, 65));   // flag red
+    g_icoCls = makeIcon(L"ক", RGB(192, 57, 43));   // brick red
+    g_icoEn  = makeIcon(L"E", RGB(127, 140, 141)); // grey
 
     g_nid.cbSize = sizeof(g_nid);
     g_nid.hWnd   = g_hWnd;
@@ -270,7 +279,7 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_hook = SetWindowsHookExW(WH_KEYBOARD_LL, hookProc, hInst, 0);
     RegisterHotKey(g_hWnd, HOTKEY_TOGGLE, MOD_CONTROL | MOD_ALT, 'B');
 
-    balloon(L"Bangla Keyboard", L"In the tray. Click the icon or press Ctrl+Alt+B to type Bangla. Right-click for Unicode / Classic.");
+    balloon(L"Bangla Keyboard", L"In the tray. Click the icon or press Ctrl+Alt+B to type Bangla. Right-click for Bangla Unicode / Bangla Classic.");
 
     MSG msg;
     while (GetMessageW(&msg, nullptr, 0, 0)) { TranslateMessage(&msg); DispatchMessageW(&msg); }

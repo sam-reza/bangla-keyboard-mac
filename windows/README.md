@@ -7,12 +7,12 @@
 >   **and `BanglaKeyboard32.dll` (x86)**; both load + COM/TSF vtables verified via
 >   `loadtest.exe` / `loadtest32.exe` (no registry changes).
 >   ⬜ Live in-app typing, composing underline, and signing still to do.
-> - ✅ **Bijoy-style tray switcher** ([`tray/`](tray/)) — `bangla-tray.exe`: a
->   system-tray icon + menu (**Unicode / Bijoy Classic / English**) + Ctrl+Alt+B,
+> - ✅ **Tray switcher** ([`tray/`](tray/)) — `bangla-tray.exe`: a system-tray
+>   icon + menu (**Bangla Unicode / Bangla Classic / English**) + Ctrl+Alt+B,
 >   types Bangla in any app via a global hook. No install/admin. Builds & runs.
-> - ✅ **Bangla Classic (SutonnyMJ)** ([`engine/classic.*`](engine/)) — the legacy
->   Bijoy ASCII layout, run via an FSM generated from the Mac `.keylayout` (19/19
->   vs the validated interpreter). Same two layouts as the macOS build.
+> - ✅ **Bangla Classic (legacy ANSI)** ([`engine/classic.*`](engine/)) — the
+>   legacy ANSI Bangla layout, run via an FSM generated from the Mac `.keylayout`
+>   (19/19 vs the validated interpreter). Same two layouts as the macOS build.
 > - ✅ **Runnable demo** — `bangla-demo.exe`: type on your keyboard, see live Bangla.
 > - 🟡 **Installer** ([`installer/`](installer/)) — `register.bat`/`unregister.bat`
 >   work; a packaged signed installer is still TODO.
@@ -67,6 +67,6 @@ windows/
 ```
 
 ## Don'ts
-- No "Bijoy" name anywhere; no bundled commercial fonts (engine emits standard Unicode, so
+- No trademarked brand names anywhere; no bundled commercial fonts (engine emits standard Unicode, so
   no fonts are needed — any Bangla Unicode font renders it).
 - Don't hand-port the macOS `.keylayout` deadkey machine — port the **engine**, it's cleaner.

@@ -118,7 +118,7 @@ Result Engine::process(unsigned scanCode, bool shift) {
 
     // 2. Reph / folas — extend the cluster.
     if (isClusterMod(unit)) {
-        // Reph (র্) is typed AFTER its consonant (Bijoy/Windows habit) but leads
+        // Reph (র্) is typed AFTER its consonant (fixed-layout/Windows habit) but leads
         // the cluster in Unicode, so reorder it to the front of a closed
         // consonant: ক then র্ -> র্ক (macOS .keylayout: state "ka" + reph ->
         // "র্ক"). Folas (্র ্য) genuinely follow, so they append. This corrects
