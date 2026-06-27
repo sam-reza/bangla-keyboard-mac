@@ -8,8 +8,11 @@
 >   `loadtest.exe` / `loadtest32.exe` (no registry changes).
 >   ⬜ Live in-app typing, composing underline, and signing still to do.
 > - ✅ **Bijoy-style tray switcher** ([`tray/`](tray/)) — `bangla-tray.exe`: a
->   system-tray icon + menu (Unicode / English) + Ctrl+Alt+B, types Bangla in any
->   app via a global hook + the shared engine. No install/admin. Builds & runs.
+>   system-tray icon + menu (**Unicode / Bijoy Classic / English**) + Ctrl+Alt+B,
+>   types Bangla in any app via a global hook. No install/admin. Builds & runs.
+> - ✅ **Bangla Classic (SutonnyMJ)** ([`engine/classic.*`](engine/)) — the legacy
+>   Bijoy ASCII layout, run via an FSM generated from the Mac `.keylayout` (19/19
+>   vs the validated interpreter). Same two layouts as the macOS build.
 > - ✅ **Runnable demo** — `bangla-demo.exe`: type on your keyboard, see live Bangla.
 > - 🟡 **Installer** ([`installer/`](installer/)) — `register.bat`/`unregister.bat`
 >   work; a packaged signed installer is still TODO.

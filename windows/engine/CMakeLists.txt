@@ -7,7 +7,7 @@ project(bangla_engine CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(bangla_engine STATIC engine.cpp)
+add_library(bangla_engine STATIC engine.cpp classic.cpp)
 target_include_directories(bangla_engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if(MSVC)
   # /utf-8 so the u"..." (char16_t) literals encode as UTF-16 correctly.
@@ -16,6 +16,10 @@ endif()
 
 add_executable(enginetest test.cpp)
 target_link_libraries(enginetest PRIVATE bangla_engine)
+
+add_executable(classictest classic_test.cpp)   # Bangla Classic (SutonnyMJ) FSM
+target_link_libraries(classictest PRIVATE bangla_engine)
+add_test(NAME classic_corpus COMMAND classictest)
 
 # Standalone runnable demo (Windows only — uses the console API).
 if(WIN32)

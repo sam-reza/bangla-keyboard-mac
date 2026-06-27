@@ -2,18 +2,29 @@
 
 `bangla-tray.exe` is a standalone background app with a **system-tray icon + popup
 menu** (Unicode / Bijoy Classic / English) — the same switch-from-the-tray UX as
-classic Bijoy. It does **not** need the TSF IME, registration, or admin: just run
-the .exe.
+classic Bijoy, with the **same two layouts the macOS build ships**. It does **not**
+need the TSF IME, registration, or admin: just run the .exe.
+
+## The three modes
+- **Unicode** (green **অ**) — standard Unicode Bangla, works with any Bangla font.
+  Uses the reordering engine ([`../engine/engine.*`](../engine/)).
+- **Bijoy Classic** (blue **ক**) — the legacy **SutonnyMJ / Bijoy ASCII** encoding,
+  byte-identical to the macOS Classic layout. Run through the Classic FSM
+  ([`../engine/classic.*`](../engine/), generated from the Mac `.keylayout`).
+  ⚠️ Renders as Bangla **only in the SutonnyMJ font** (or another Bijoy ASCII font)
+  — set your document/app font to SutonnyMJ. We don't bundle it (commercial font).
+- **English** (red **E**) — passthrough.
 
 ## How it works
-- A green **অ** tray icon = Unicode (Bangla) mode; a red **E** = English.
-- Switch with: **left-click the tray icon**, the **right-click menu**, or **Ctrl+Alt+B**.
-- In Unicode mode a global low-level keyboard hook (`WH_KEYBOARD_LL`) runs each
-  keystroke through the shared engine ([`../engine/`](../engine/)) and injects the
-  resulting Bangla with `SendInput`, so it works in **any** app (Notepad, Word,
-  browsers, chat). English mode passes every key straight through.
-- The layout + reordering are identical to the rest of the project (it's the same
-  engine): prebase vowel before consonant, reph-after-consonant, conjuncts, etc.
+- Switch with: **left-click the tray icon** (toggles English ⇄ last Bangla mode),
+  the **right-click menu**, or **Ctrl+Alt+B**.
+- A global low-level keyboard hook (`WH_KEYBOARD_LL`) runs each keystroke through
+  the selected engine and injects the result with `SendInput`, so it works in
+  **any** app (Notepad, Word, browsers, chat).
+  - Unicode reorders (prebase vowel, reph), so it injects by back-spacing the live
+    syllable and retyping.
+  - Classic is visual-order, so injection is **append-only** (more robust).
+- Same fixed (Bijoy-style) key layout as the rest of the project / the Mac build.
 
 ## Run it
 1. Build (see [`../build-all.bat`](../build-all.bat)) → `../dist/bangla-tray.exe`.
@@ -37,9 +48,9 @@ Both share the **same engine**, so typing behaviour matches. Use the tray app fo
 the Bijoy-style experience; use the IME for the most robust integration.
 
 ## Limitations / TODO
-- **Bijoy Classic** menu item is a stub (greyed). Classic = ASCII/SutonnyMJ output,
-  which is font-dependent; the engine here emits Unicode only.
-- Injection (backspace-diff) can misbehave in apps that delete by grapheme cluster,
+- **Classic needs the SutonnyMJ font** to render (we can't bundle it). Without it
+  the text shows as Latin/symbol characters (the raw Bijoy ASCII), same as on Mac.
+- Unicode injection (backspace-diff) can misbehave in apps that delete by grapheme cluster,
   in password fields, or in some full-screen games. The TSF IME avoids this.
 - x64 only — a global hook works across all apps regardless of their bitness, so no
   separate 32-bit build is needed.
