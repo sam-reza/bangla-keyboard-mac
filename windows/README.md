@@ -10,9 +10,10 @@
 > - ✅ **Tray switcher** ([`tray/`](tray/)) — `bangla-tray.exe`: a system-tray
 >   icon + menu (**Bangla Unicode / Bangla Classic / English**) + Ctrl+Alt+B,
 >   types Bangla in any app via a global hook. No install/admin. Builds & runs.
-> - ✅ **Bangla Classic (legacy ANSI)** ([`engine/classic.*`](engine/)) — the
->   legacy ANSI Bangla layout, run via an FSM generated from the Mac `.keylayout`
->   (19/19 vs the validated interpreter). Same two layouts as the macOS build.
+> - ✅ **Exact macOS parity** ([`engine/klengine.*`](engine/)) — both Bangla Unicode
+>   and Bangla Classic are driven by FSM tables generated from the Mac `.keylayout`
+>   files, so output is byte-identical to the Mac (20/20 + 12/12 vs the validated
+>   interpreter). Independent vowels match too: `f`→া, `Shift+f`→অ, `Shift+f f`→আ.
 > - ✅ **Runnable demo** — `bangla-demo.exe`: type on your keyboard, see live Bangla.
 > - 🟡 **Installer** ([`installer/`](installer/)) — `register.bat`/`unregister.bat`
 >   work; a packaged signed installer is still TODO.

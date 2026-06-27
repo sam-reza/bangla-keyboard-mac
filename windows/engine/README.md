@@ -1,73 +1,57 @@
-# Bangla Keyboard — Windows engine (C++ port)
+# Bangla Keyboard — Windows engine
 
-Pure, OS-independent port of [`../../engine/Engine.swift`](../../engine/Engine.swift),
-keyed by **Windows Set-1 scan codes** instead of macOS virtual key codes. No
-Windows headers — it builds and unit-tests headless, and is reused unchanged
-inside the TSF text service ([`../tsf/`](../tsf/)).
+Two engines live here:
+
+## 1. KLEngine — keylayout-driven (the product engine) ✅
+`klengine.h` / `klengine.cpp` run an Apple `.keylayout` deadkey FSM (the same
+algorithm as `keylayout_interp.py`) from a generated table. **Both layouts use it**,
+so the Windows output is **byte-identical to the macOS build** — no hand-written
+rules that can drift.
 
 | file | role |
 |---|---|
-| `engine.h` / `engine.cpp` | the engine (UTF-16 / `std::u16string`) |
-| `test.cpp` | headless test over the SPEC §7 corpus (no ICU) |
-| `verify.py` | a behaviour-faithful Python mirror of the same algorithm |
-| `CMakeLists.txt`, `build-and-test.bat` | build + run the test |
+| `klengine.h/.cpp` | the table-driven engine (append-only) |
+| `unicode_table.h` | Bangla Unicode FSM (`bangla::unicode_table::TABLE`) |
+| `classic_table.h` | Bangla Classic / legacy-ANSI FSM (`bangla::classic_table::TABLE`) |
+| `keylayout_interp.py` | faithful Python interpreter of the `.keylayout` (ground truth) |
+| `gen_tables.py` | generates both `*_table.h` from the Mac `.keylayout` files |
+| `gen_klengine_test.py` → `klengine_test.cpp` | C++ engine vs interpreter (20/20 Unicode, 12/12 Classic) |
+| `demo.cpp` → `bangla-demo.exe` | runnable demo (`--classic`, `--keys "c j f"`) |
 
-## Status: ✅ verified — **13/13** SPEC §7 corpus passes (compiled C++ and Python)
-Built with MinGW g++ to `../dist/enginetest.exe` and run → 13/13. `verify.py` is a
-Python mirror (Python iterates strings by Unicode scalar, matching the engine's
-semantics; Bengali is all BMP), also 13/13.
+It is **append-only**: `process()` returns the text to append (often empty while a
+deadkey is pending), `flush()` emits the dangling deadkey on a boundary. No
+back-spacing, so injection (in the tray) is robust in every app.
 
+Regenerate after any `.keylayout` change:
+`python gen_tables.py && python gen_klengine_test.py`.
+
+### Vowel behaviour (matches macOS exactly)
+The fixed layout does **not** auto-convert an isolated matra to an independent
+vowel. Independent vowels are typed via the অ deadkey:
+
+| keys | output | |
+|---|---|---|
+| `f` | া | aa-kar (stays a matra) |
+| `Shift+f` | অ | independent a |
+| `Shift+f` then `f` | **আ** | অ + া → আ (U+0986) |
+| `Shift+f f m d` | আমি | |
+| `c j f` | কো | prebase ে reorders, +া → ো |
+| `Shift+h f n Shift+a b` | ভার্সন | reph reorders |
+| `h f Shift+q Shift+v f` | বাংলা | |
+
+(Classic emits the legacy ANSI encoding, e.g. `h f Shift+q Shift+v f` → `evsjv`,
+which renders as বাংলা only in a legacy ANSI Bangla font.)
+
+## 2. engine.* — the old hand-written Unicode engine ⚠️ (IME only)
+`engine.h` / `engine.cpp` / `test.cpp` / `verify.py` are the original hand port of
+`../../engine/Engine.swift`. It is still used by the **TSF IME** (`../tsf/`) only.
+It differs from the macOS `.keylayout` on independent vowels (it auto-converts an
+isolated matra, so `f`→আ). The tray/demo use KLEngine instead for exact parity;
+the IME will be migrated to KLEngine too. Its own corpus test is `enginetest` (13/13).
+
+## Build / test
 ```bat
-python verify.py                :: passes now, no toolchain needed
-..\build-all.bat                :: builds enginetest.exe + bangla-demo.exe (+ DLL)
-build-and-test.bat              :: just the C++ test (MSVC 'cl' or MinGW 'g++')
+python keylayout_interp.py      :: interpreter sanity (no toolchain)
+..\build-all.bat                :: builds klengine-test, enginetest, demo, tray, DLLs
+:: or: cmake -B build && cmake --build build && ctest --test-dir build
 ```
-
-`demo.cpp` → `bangla-demo.exe` is a standalone runnable demo of this same engine:
-type on a US-QWERTY keyboard and watch live Bangla (`--keys "c j f"` for batch).
-
-## Bangla Classic (legacy ANSI Bangla)
-`classic.h` / `classic.cpp` + `classic_table.h` are the **Classic** layout (the
-legacy ANSI Bangla encoding, same as the macOS Classic `.keylayout`). Classic is a
-fully-deferred deadkey machine, so instead of hand-porting it we **run its FSM**:
-- `keylayout_interp.py` — a faithful interpreter of Apple `.keylayout` deadkey
-  machines. Cross-validated by running it on the *Unicode* `.keylayout` against the
-  SPEC corpus (11/13 — the 2 misses are a known Engine.swift-vs-keylayout diff on
-  isolated independent vowels, irrelevant to Classic).
-- `gen_classic.py` → `classic_table.h` — emits the Classic FSM (states/actions/
-  terminators, keyed by Windows scan code) as a C++ table.
-- `gen_classic_test.py` → `classic_test.cpp` — bakes ground-truth outputs from the
-  interpreter; the C++ `ClassicEngine` passes **19/19** against them.
-
-Classic output is the legacy encoding (renders as Bangla only in a legacy ANSI
-Bangla font), so it's append-only (visual order, no reordering). Regenerate after any
-`.keylayout` change: `python gen_classic.py && python gen_classic_test.py`.
-
-## Design notes carried over from the spec
-- **UTF-16, BMP-only.** One `char16_t` == one Unicode scalar for every character
-  the engine emits, so `endsWithHasanta` (last unit == `U+09CD`) and the
-  single-code-point consonant test are exact — no grapheme-cluster trap (SPEC §3).
-- **NFC by construction.** `e`-kar+`aa` is combined to the single code point `ো`
-  (U+09CB) and `au` to `ৌ` (U+09CC); every other unit is already precomposed, so
-  the output needs no NFC pass.
-
-## ⚠️ One deliberate divergence from `Engine.swift`: reph reordering
-`Engine.swift` handles reph (`র্`) with a plain `cons += "র্"` (append). That does
-**not** reorder, and a faithful port of it **fails** SPEC §7's two "non-negotiable"
-reph-after-consonant cases:
-
-```
-ভার্সন  keys '^h f n ^a b'  ->  got ভাসর্ন  (reph appended, on the wrong consonant)
-কর্ম    keys 'j m ^a'       ->  got কমর্
-```
-
-The shipping macOS `.keylayout` — the **verified ground truth** the spec points to
-— *does* reorder: in state `ka` (consonant `ক` buffered) the reph key outputs
-**`র্ক`** (reph moved to the front). This port follows the `.keylayout` and SPEC
-§7: when reph arrives on a *closed* consonant it is prepended
-(`cons = "র্" + cons`); the folas `্র`/`্য` genuinely follow and still append.
-With that one-line fix the corpus is 13/13.
-
-**This looks like a bug in `Engine.swift` itself** (its reph append never reorders).
-Recommend porting the same fix back to `Engine.swift` so all three platforms match;
-until then this is a documented, evidence-backed deviation, not a silent one.

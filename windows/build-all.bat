@@ -19,11 +19,11 @@ set "SRC=engine\engine.cpp tsf\Globals.cpp tsf\TextService.cpp tsf\Dll.cpp tsf\B
 set "FLAGS=-std=c++17 -O2 -shared -static -static-libgcc -static-libstdc++ -DUNICODE -D_UNICODE -Itsf -Iengine"
 set "LIBS=-lole32 -loleaut32 -luuid -ladvapi32 -luser32"
 
-echo [x64] enginetest + classictest + bangla-demo + bangla-tray
+echo [x64] klengine-test + enginetest + bangla-demo + bangla-tray
+%GXX64% -B"%B64%." -std=c++17 -O2 -static -finput-charset=UTF-8 engine\klengine_test.cpp engine\klengine.cpp -o dist\klengine-test.exe || goto :fail
 %GXX64% -B"%B64%." -std=c++17 -O2 -static -finput-charset=UTF-8 engine\test.cpp engine\engine.cpp -o dist\enginetest.exe || goto :fail
-%GXX64% -B"%B64%." -std=c++17 -O2 -static -finput-charset=UTF-8 engine\classic_test.cpp engine\classic.cpp -o dist\classictest.exe || goto :fail
-%GXX64% -B"%B64%." -std=c++17 -O2 -static -finput-charset=UTF-8 engine\demo.cpp engine\engine.cpp -o dist\bangla-demo.exe || goto :fail
-%GXX64% -B"%B64%." -std=c++17 -O2 -static -mwindows -municode -finput-charset=UTF-8 tray\tray.cpp engine\engine.cpp engine\classic.cpp -o dist\bangla-tray.exe -lgdi32 -luser32 -lshell32 || goto :fail
+%GXX64% -B"%B64%." -std=c++17 -O2 -static -finput-charset=UTF-8 engine\demo.cpp engine\klengine.cpp -o dist\bangla-demo.exe || goto :fail
+%GXX64% -B"%B64%." -std=c++17 -O2 -static -mwindows -municode -finput-charset=UTF-8 tray\tray.cpp engine\klengine.cpp -o dist\bangla-tray.exe -lgdi32 -luser32 -lshell32 || goto :fail
 echo [x64] BanglaKeyboard.dll + loadtest.exe
 %GXX64% -B"%B64%." %FLAGS% %SRC% -o dist\BanglaKeyboard.dll %LIBS% || goto :fail
 %GXX64% -B"%B64%." -std=c++17 -O2 -static tsf\loadtest.cpp -o dist\loadtest.exe -lole32 -loleaut32 -luuid || goto :fail

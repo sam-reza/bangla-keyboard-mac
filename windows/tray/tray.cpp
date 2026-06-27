@@ -24,14 +24,12 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <vector>
-#include "../engine/engine.h"
-#include "../engine/classic.h"
+#include "../engine/klengine.h"
+#include "../engine/unicode_table.h"
+#include "../engine/classic_table.h"
 
-using bangla::Engine;
-using bangla::ClassicEngine;
-using bangla::Result;
-using bangla::ResultKind;
-using bangla::Str;
+using bangla::KLEngine;
+using Str = std::u16string;
 
 enum Mode { MODE_ENGLISH = 0, MODE_UNICODE = 1, MODE_CLASSIC = 2 };
 
@@ -39,9 +37,8 @@ enum Mode { MODE_ENGLISH = 0, MODE_UNICODE = 1, MODE_CLASSIC = 2 };
 static HINSTANCE       g_hInst;
 static HWND            g_hWnd;
 static HHOOK           g_hook;
-static Engine          g_uni;              // Unicode engine
-static ClassicEngine   g_classic;          // Classic engine
-static Str             g_shown;            // Unicode mode: current on-screen syllable
+static KLEngine        g_uni(&bangla::unicode_table::TABLE);  // Unicode (keylayout-driven)
+static KLEngine        g_classic(&bangla::classic_table::TABLE); // Classic
 static Mode            g_mode = MODE_ENGLISH;
 static Mode            g_lastBangla = MODE_UNICODE;  // what Ctrl+Alt+B / click returns to
 static bool            g_classicHintShown = false;
@@ -61,16 +58,7 @@ static HBITMAP         g_bmpEn  = nullptr;
 #define ID_EXIT     1011
 #define HOTKEY_TOGGLE 1
 
-// ---- key injection ---------------------------------------------------------
-static void sendBackspaces(int n) {
-    if (n <= 0) return;
-    std::vector<INPUT> in; in.reserve(n * 2);
-    for (int i = 0; i < n; ++i) {
-        INPUT d = {}; d.type = INPUT_KEYBOARD; d.ki.wVk = VK_BACK; in.push_back(d);
-        INPUT u = {}; u.type = INPUT_KEYBOARD; u.ki.wVk = VK_BACK; u.ki.dwFlags = KEYEVENTF_KEYUP; in.push_back(u);
-    }
-    SendInput((UINT)in.size(), in.data(), sizeof(INPUT));
-}
+// ---- key injection (append-only — works for both modes) --------------------
 static void sendUnicode(const Str& s) {
     if (s.empty()) return;
     std::vector<INPUT> in; in.reserve(s.size() * 2);
@@ -81,28 +69,11 @@ static void sendUnicode(const Str& s) {
     SendInput((UINT)in.size(), in.data(), sizeof(INPUT));
 }
 
-// Unicode mode: realise one engine Result by editing the on-screen syllable.
-static void realizeUni(const Result& r) {
-    switch (r.kind) {
-        case ResultKind::Ignore: return;
-        case ResultKind::Compose:
-            sendBackspaces((int)g_shown.size()); sendUnicode(r.text); g_shown = r.text; break;
-        case ResultKind::Commit:
-            sendBackspaces((int)g_shown.size()); sendUnicode(r.text); g_shown.clear(); break;
-        case ResultKind::CommitThenCompose:
-            sendBackspaces((int)g_shown.size()); sendUnicode(r.text); sendUnicode(r.comp); g_shown = r.comp; break;
-    }
-}
+static KLEngine* currentEngine() { return g_mode == MODE_CLASSIC ? &g_classic : &g_uni; }
 
-// Finalise whatever is pending in the current mode (space / Enter / chord / focus).
+// Finalise whatever is pending (space / Enter / chord / focus loss).
 static void flushCurrent() {
-    if (g_mode == MODE_UNICODE) {
-        Str fin = g_uni.flush();
-        if (fin != g_shown) { sendBackspaces((int)g_shown.size()); sendUnicode(fin); }
-        g_shown.clear();
-    } else if (g_mode == MODE_CLASSIC) {
-        sendUnicode(g_classic.flush());   // append-only; just emit the dangling glyph
-    }
+    if (g_mode != MODE_ENGLISH) sendUnicode(currentEngine()->flush());
 }
 
 // ---- the global keyboard hook ----------------------------------------------
@@ -116,15 +87,15 @@ static LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam) {
             bool win   = down(VK_LWIN) || down(VK_RWIN);
             bool shift = down(VK_SHIFT);
             unsigned scan = k->scanCode;
+            KLEngine* eng = currentEngine();
 
             if (ctrl || alt || win) {
                 flushCurrent();                               // let the shortcut through
-            } else if (g_mode == MODE_UNICODE) {
-                if (g_uni.wouldHandle(scan)) { realizeUni(g_uni.process(scan, shift)); return 1; }
-                flushCurrent();
-            } else { // MODE_CLASSIC
-                if (g_classic.wouldHandle(scan)) { sendUnicode(g_classic.process(scan, shift)); return 1; }
-                flushCurrent();
+            } else if (eng->wouldHandle(scan)) {
+                sendUnicode(eng->process(scan, shift));       // append-only
+                return 1;                                     // swallow the original key
+            } else {
+                flushCurrent();                               // space / Enter / Tab / etc.
             }
         }
     }
@@ -215,7 +186,7 @@ static void balloon(const wchar_t* title, const wchar_t* text) {
 static void setMode(Mode m) {
     if (g_mode == m) return;
     flushCurrent();                 // finalise anything pending in the old mode
-    g_uni.reset(); g_classic.reset(); g_shown.clear();
+    g_uni.reset(); g_classic.reset();
     g_mode = m;
     if (m == MODE_UNICODE || m == MODE_CLASSIC) g_lastBangla = m;
     updateTray();

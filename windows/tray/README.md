@@ -7,10 +7,10 @@ registration, or admin: just run the .exe.
 
 ## The three modes
 - **Bangla Unicode** (অ on a red circle) — standard Unicode Bangla, works with any
-  Bangla font. Uses the reordering engine ([`../engine/engine.*`](../engine/)).
+  Bangla font. Driven by the Mac Unicode `.keylayout` FSM (`../engine/unicode_table.h`).
 - **Bangla Classic** (ক on a brick-red circle) — the **legacy ANSI Bangla**
   encoding, byte-identical to the macOS Classic layout. Run through the Classic FSM
-  ([`../engine/classic.*`](../engine/), generated from the Mac `.keylayout`).
+  (`../engine/classic_table.h`, generated from the Mac `.keylayout`).
   ⚠️ Renders as Bangla **only in a legacy ANSI Bangla font** (the kind used for old
   documents) — set your document/app font to one. We don't bundle one (commercial).
 - **English** (E on a grey circle) — passthrough.
@@ -22,12 +22,13 @@ coloured circle + a white Bangla letter.
 - Switch with: **left-click the tray icon** (toggles English ⇄ last Bangla mode),
   the **right-click menu**, or **Ctrl+Alt+B**.
 - A global low-level keyboard hook (`WH_KEYBOARD_LL`) runs each keystroke through
-  the selected engine and injects the result with `SendInput`, so it works in
-  **any** app (Notepad, Word, browsers, chat).
-  - Unicode reorders (prebase vowel, reph), so it injects by back-spacing the live
-    syllable and retyping.
-  - Classic is visual-order, so injection is **append-only** (more robust).
-- Same fixed key layout as the rest of the project / the Mac build.
+  the keylayout-driven engine ([`../engine/klengine.*`](../engine/)) and injects the
+  result with `SendInput`, so it works in **any** app (Notepad, Word, browsers,
+  chat). Both modes are **append-only** (the deadkey FSM defers and emits in final
+  order — prebase vowel and reph still reorder), so there's **no back-spacing** —
+  robust everywhere.
+- Output is **byte-identical to the macOS build** (same `.keylayout` FSM), incl.
+  independent vowels: `f`→া, `Shift+f`→অ, `Shift+f` then `f`→আ.
 
 ## Run it
 1. Build (see [`../build-all.bat`](../build-all.bat)) → `../dist/bangla-tray.exe`.
@@ -53,8 +54,8 @@ the switch-from-the-tray experience; use the IME for the most robust integration
 ## Limitations / TODO
 - **Classic needs a legacy ANSI Bangla font** to render (we can't bundle one).
   Without it the text shows as Latin/symbol characters, same as on Mac.
-- Unicode injection (backspace-diff) can misbehave in apps that delete by grapheme
-  cluster, in password fields, or in some full-screen games. The TSF IME avoids this.
+- Injection is append-only (no back-spacing), so it's robust — but a global hook +
+  `SendInput` can still be blocked in password fields or some full-screen games.
 - x64 only — a global hook works across all apps regardless of their bitness, so no
   separate 32-bit build is needed.
 - Unsigned — code-sign before distributing (a keyboard hook + unsigned exe will
