@@ -1,6 +1,15 @@
 # Bangla Keyboard — Windows port (TSF IME)
 
-> **Status: not started.** This folder is the home for the Windows build. Start here.
+> **Status: in progress.**
+> - ✅ **Engine ported to C++** ([`engine/`](engine/)) — passes 13/13 of the SPEC §7
+>   corpus (verified via `engine/verify.py`; `engine/test.cpp` is the same in C++).
+> - ⬜ **TSF text service** ([`tsf/`](tsf/)) — scaffolded (engine wired to
+>   composition via edit sessions); needs a build + verify pass on a Windows SDK box.
+> - ⬜ **Installer** ([`installer/`](installer/)) — notes only.
+>
+> ⚠️ Found a reph-reordering bug in the reference `engine/Engine.swift` while porting
+> (`ভার্সন`/`কর্ম` fail a faithful port); the C++ engine fixes it per the macOS
+> `.keylayout` ground truth. See [`engine/README.md`](engine/README.md).
 
 ## Read first
 1. [`../SPEC.md`](../SPEC.md) — the complete, OS-neutral engine spec (keymap + algorithm +

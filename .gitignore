@@ -3,3 +3,14 @@ dist/
 .DS_Store
 **/.DS_Store
 *.pax
+
+# Windows C++ / CMake build artifacts
+build/
+*.exe
+*.obj
+*.dll
+*.lib
+*.exp
+*.pdb
+*.ilk
+__pycache__/

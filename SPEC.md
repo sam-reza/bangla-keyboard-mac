@@ -123,7 +123,14 @@ Look the key up in the **keymap** (§6) to get a Bangla `unit` string. If unmapp
 Otherwise, in this order:
 
 1. **`unit == hasanta`** → `cons += unit`; `compose`.
-2. **`unit ∈ clusterMods`** (`র্ ্র ্য`) → `cons += unit`; `compose`.
+2. **`unit ∈ clusterMods`** (`র্ ্র ্য`) → extend the cluster, `compose`. Reph
+   (`র্`) is typed *after* its consonant (Bijoy/Windows habit) but leads the
+   cluster in Unicode, so reorder it to the **front** of a closed consonant:
+   `cons = "র্" + cons` when `cons` is non-empty and does **not** end in hasanta
+   (`ক` then `র্` → `র্ক`). The folas (`্র ্য`) genuinely follow → `cons += unit`.
+   (Without the reph reorder, the §7 cases `ভার্সন` / `কর্ম` come out as
+   `ভাসর্ন` / `কমর্`. Verified against the macOS `.keylayout`: state `ka` + reph
+   → `র্ক`.)
 3. **`unit ∈ prebase`** (`ি ে ৈ`):
    - if buffer **not** empty → `final = renderFinal(); reset(); vowel = unit`;
      `commitThenCompose(final, render)`  ← prebase starts a NEW syllable

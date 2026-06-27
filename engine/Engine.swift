@@ -80,9 +80,19 @@ final class Engine {
             cons += unit
             return .compose(render())
         }
-        // Reph / folas — extend the cluster
+        // Reph / folas — extend the cluster.
+        // Reph (র্) is typed AFTER its consonant (Bijoy/Windows habit) but leads
+        // the cluster in Unicode, so reorder it to the FRONT of a closed
+        // consonant: ক then র্ -> র্ক. (macOS .keylayout ground truth: state "ka"
+        // + reph -> "র্ক".) The folas ্র ্য genuinely follow, so they append.
+        // Without this, the SPEC §7 reph-after-consonant cases ভার্সন / কর্ম come
+        // out as ভাসর্ন / কমর্.
         if Engine.clusterMods.contains(unit) {
-            cons += unit
+            if unit == "র্" && !cons.isEmpty && !endsWithHasanta(cons) {
+                cons = "র্" + cons
+            } else {
+                cons += unit
+            }
             return .compose(render())
         }
         // Prebase vowel (ি ে ৈ) — always typed BEFORE its consonant (Windows/Bijoy).
