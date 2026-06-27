@@ -31,5 +31,5 @@ License/copyright above was read from each font's own embedded metadata.
   download them yourself from the Bangladesh Computer Council if you want them.
 - **Siyam Rupali ANSI, Kalpurush ANSI** — legacy ASCII variants with no clear
   license; excluded.
-- **All "MJ"‑family fonts (SutonnyMJ etc.)** — proprietary; not included. See
-  the README for how to add SutonnyMJ for the Bangla Classic layout.
+- **All legacy ANSI ("MJ"‑family) Bangla fonts** — proprietary; not included. See
+  the README for how to add a legacy ANSI Bangla font for the Bangla Classic layout.

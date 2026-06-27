@@ -1,6 +1,6 @@
 # engine/ — the shared reordering engine (source of truth)
 
-[`Engine.swift`](Engine.swift) is the **canonical** Bijoy-style reordering engine: it buffers
+[`Engine.swift`](Engine.swift) is the **canonical** fixed-layout reordering engine: it buffers
 one syllable and reorders it so a prebase vowel typed before its consonant lands in correct
 Unicode order. It has **no OS dependencies** — pure `(key, shift) -> Result`.
 

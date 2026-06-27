@@ -18,7 +18,7 @@ typed the same way as on Windows — plus a set of free Unicode Bangla fonts.
 | Layout | Output | Use with |
 |---|---|---|
 | **Bangla Unicode** | Proper Unicode Bangla (U+0980 block) | Any Unicode Bangla font (14 included) |
-| **Bangla Classic** | Legacy ASCII encoding for "MJ"-family fonts | **SutonnyMJ** (see note below — not included) |
+| **Bangla Classic** | Legacy ASCII encoding for "MJ"-family fonts | a legacy ANSI Bangla font (see note below — not included) |
 | **14 free fonts** | SolaimanLipi, Kalpurush, Siyam Rupali, AdorshoLipi, Lohit, Mukti, Akaash, … | installed to `/Library/Fonts` |
 
 ### Natural, Windows-style typing
@@ -74,13 +74,13 @@ xattr -dr com.apple.quarantine ~/Desktop/"Bangla Keyboard Installer.app"
 …and open it. (This warning goes away entirely only with a notarized build,
 which needs a paid Apple Developer ID.)
 
-## ⚠️ About the Bangla Classic layout (SutonnyMJ)
+## ⚠️ About the Bangla Classic layout (legacy ANSI fonts)
 
 The **Bangla Classic** layout outputs the **legacy ASCII (non-Unicode)**
-encoding that "MJ"-family fonts use. Those fonts are **proprietary and are not
-included** in this project. To use the Classic layout you must install a
-compatible font such as **SutonnyMJ** **from your own legitimate source**, then
-select that font in your app.
+encoding that legacy ANSI ("MJ"-family) Bangla fonts use. Those fonts are
+**proprietary and are not included** in this project. To use the Classic layout
+you must install a compatible legacy ANSI Bangla font **from your own legitimate
+source**, then select that font in your app.
 
 The **Bangla Unicode** layout has no such requirement — it works with any of the
 bundled Unicode fonts (or system Bangla fonts).

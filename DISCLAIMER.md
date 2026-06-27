@@ -21,7 +21,7 @@ redistribute any third‑party vendor's proprietary software, branding, or fonts
 - The **bundled fonts** are free/libre Bangla Unicode fonts licensed under the
   **GNU GPL** or the **SIL Open Font License**. They remain the copyright of
   their respective authors. Full per‑font licenses are in `fonts-licenses/`.
-- **No proprietary "MJ"‑family fonts (e.g. SutonnyMJ) are included.** The
+- **No proprietary legacy ANSI ("MJ"‑family) Bangla fonts are included.** The
   **Bangla Classic** layout produces the legacy ASCII encoding those fonts use;
   to type with it you must obtain such a font **from your own legitimate
   source**. The **Bangla Unicode** layout needs no special font — any bundled

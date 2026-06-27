@@ -1,4 +1,4 @@
-// Bangla Keyboard — reordering engine (Windows/Bijoy-style, fixed layout).
+// Bangla Keyboard — reordering engine (Windows-style fixed layout).
 // Buffers one syllable (consonant cluster + vowel + trailing signs) and commits
 // it on a syllable boundary, so a prebase vowel typed FIRST (ে then ক) reorders
 // into correct Unicode order (কে) with no character left composing at rest.
@@ -81,7 +81,7 @@ final class Engine {
             return .compose(render())
         }
         // Reph / folas — extend the cluster.
-        // Reph (র্) is typed AFTER its consonant (Bijoy/Windows habit) but leads
+        // Reph (র্) is typed AFTER its consonant (fixed-layout/Windows habit) but leads
         // the cluster in Unicode, so reorder it to the FRONT of a closed
         // consonant: ক then র্ -> র্ক. (macOS .keylayout ground truth: state "ka"
         // + reph -> "র্ক".) The folas ্র ্য genuinely follow, so they append.
@@ -95,7 +95,7 @@ final class Engine {
             }
             return .compose(render())
         }
-        // Prebase vowel (ি ে ৈ) — always typed BEFORE its consonant (Windows/Bijoy).
+        // Prebase vowel (ি ে ৈ) — always typed BEFORE its consonant (Windows/fixed-layout).
         // So if anything is already buffered, that syllable is done; this vowel begins
         // a NEW syllable and waits for the next consonant (হ then ে -> commit হ, then চ্ছে).
         if Engine.prebase.contains(unit) {

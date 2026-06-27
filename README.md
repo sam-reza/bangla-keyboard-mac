@@ -1,9 +1,9 @@
 <h1 align="center">Bangla Keyboard</h1>
 
 <p align="center">
-  A free, open-source <b>Bijoy-style fixed Bangla keyboard</b> for <b>macOS, Windows, and Linux</b>.<br>
-  Type a prebase vowel before its consonant (the Windows/Bijoy habit) and get correct Unicode order.<br>
-  No "Bijoy" branding, no proprietary fonts — emits standard Unicode.
+  A free, open-source <b>fixed-layout Bangla keyboard</b> for <b>macOS, Windows, and Linux</b>.<br>
+  Type a prebase vowel before its consonant (the Windows-order habit) and get correct Unicode order.<br>
+  No trademarked branding, no proprietary fonts — emits standard Unicode.
 </p>
 
 <p align="center"><i>Built and maintained by <a href="https://www.biswashost.com">BiswasHost</a> 🇧🇩</i></p>
@@ -15,7 +15,7 @@
 | OS | What it is | Status | Folder |
 |----|-----------|--------|--------|
 | 🍎 **macOS** | Native `.keylayout` (Unicode + Classic) + smart installer `.pkg`/`.dmg` | ✅ **shipping** | [`macos/`](macos/) |
-| 🪟 **Windows** | TSF IME (Text Services Framework) running the shared engine | ⬜ in progress | [`windows/`](windows/) |
+| 🪟 **Windows** | Tray app (Bangla Unicode + Classic) running the shared engine, + a TSF IME | ✅ **v1.0.0** | [`windows/`](windows/) |
 | 🐧 **Linux** | IBus / Fcitx5 engine running the shared engine | ⬜ planned | [`linux/`](linux/) |
 
 **macOS users:** grab the latest `.pkg`/`.dmg` from [**Releases**](../../releases) and see

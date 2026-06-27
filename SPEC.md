@@ -13,9 +13,9 @@ far more convoluted; the engine is the clean model).
 
 ## 1. What this keyboard is
 
-A **fixed (Bijoy-style) Bangla layout**: each physical key has a fixed Bangla letter/sign,
+A **fixed Bangla layout**: each physical key has a fixed Bangla letter/sign,
 and an **engine reorders one syllable at a time** so that you can type a **prebase vowel
-before its consonant** (the Windows/Bijoy habit) and get correct Unicode order.
+before its consonant** (the Windows/fixed-layout habit) and get correct Unicode order.
 
 Example: typing `ে` then `ক` must produce `কে` (U+0995 U+09C7), not `েক`.
 
@@ -124,7 +124,7 @@ Otherwise, in this order:
 
 1. **`unit == hasanta`** → `cons += unit`; `compose`.
 2. **`unit ∈ clusterMods`** (`র্ ্র ্য`) → extend the cluster, `compose`. Reph
-   (`র্`) is typed *after* its consonant (Bijoy/Windows habit) but leads the
+   (`র্`) is typed *after* its consonant (fixed-layout/Windows habit) but leads the
    cluster in Unicode, so reorder it to the **front** of a closed consonant:
    `cons = "র্" + cons` when `cons` is non-empty and does **not** end in hasanta
    (`ক` then `র্` → `র্ক`). The folas (`্র ্য`) genuinely follow → `cons += unit`.
@@ -293,7 +293,7 @@ sequences and prints NFC output; assert against §7. Do this BEFORE wiring the O
 
 ## 10. License / branding
 
-MIT (see `LICENSE`). De-branded "Bangla Keyboard" — **no "Bijoy" trademark anywhere**, no
-proprietary fonts in the repo (macOS Classic needs user-supplied SutonnyMJ; the Unicode
-layout + all three OS IMEs are font-independent — they emit standard Unicode). Keep every
-new file free of the Bijoy name and of any commercial font.
+MIT (see `LICENSE`). De-branded "Bangla Keyboard" — **no trademarked brand name anywhere**,
+no proprietary fonts in the repo (the Classic layout needs a user-supplied legacy ANSI
+Bangla font; the Unicode layout + all OS IMEs are font-independent — they emit standard
+Unicode). Keep every new file free of trademarked brand names and of any commercial font.
