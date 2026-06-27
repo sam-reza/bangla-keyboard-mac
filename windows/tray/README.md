@@ -18,9 +18,17 @@ registration, or admin: just run the .exe.
 The tray icons match the macOS build: a green square (Bangladesh-flag green) + a
 coloured circle + a white Bangla letter.
 
+## Switching
+- **Ctrl+Alt+V** → Bangla Unicode (press again → English)
+- **Ctrl+Alt+B** → Bangla Classic (press again → English)
+- Or **left-click** the tray icon (English ⇄ last Bangla), or the **right-click menu**.
+- **All English shortcuts pass through unchanged** — Ctrl+C/V/X/A (copy/paste/cut/
+  select-all), Ctrl+S / Ctrl+Shift+S (save / save as), Ctrl+Z/Y, Alt+F4, Alt+Tab,
+  Win+…, arrows/Home/End, etc. The hook only converts plain typing keys; anything
+  with Ctrl/Alt/Win held is left for the app. (Note: Ctrl+Alt+V is taken by us, so
+  apps that use it for "paste special" won't get it while the keyboard is running.)
+
 ## How it works
-- Switch with: **left-click the tray icon** (toggles English ⇄ last Bangla mode),
-  the **right-click menu**, or **Ctrl+Alt+B**.
 - A global low-level keyboard hook (`WH_KEYBOARD_LL`) runs each keystroke through
   the keylayout-driven engine ([`../engine/klengine.*`](../engine/)) and injects the
   result with `SendInput`, so it works in **any** app (Notepad, Word, browsers, chat).

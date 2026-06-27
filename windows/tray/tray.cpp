@@ -58,7 +58,8 @@ static HBITMAP         g_bmpEn  = nullptr;
 #define ID_ENGLISH  1003
 #define ID_ABOUT    1010
 #define ID_EXIT     1011
-#define HOTKEY_TOGGLE 1
+#define HOTKEY_UNICODE 1   // Ctrl+Alt+V toggles Bangla Unicode <-> English
+#define HOTKEY_CLASSIC 2   // Ctrl+Alt+B toggles Bangla Classic <-> English
 
 // ---- key injection ---------------------------------------------------------
 static void sendBackspaces(int n) {
@@ -202,9 +203,9 @@ static HBITMAP makeMenuBitmap(const wchar_t* txt, COLORREF circle) {
 
 static const wchar_t* modeTip() {
     switch (g_mode) {
-        case MODE_UNICODE: return L"Bangla Keyboard — Bangla Unicode  (Ctrl+Alt+B = English)";
-        case MODE_CLASSIC: return L"Bangla Keyboard — Bangla Classic  (Ctrl+Alt+B = English)";
-        default:           return L"Bangla Keyboard — English  (Ctrl+Alt+B = Bangla)";
+        case MODE_UNICODE: return L"Bangla Keyboard — Bangla Unicode  (Ctrl+Alt+V toggles)";
+        case MODE_CLASSIC: return L"Bangla Keyboard — Bangla Classic  (Ctrl+Alt+B toggles)";
+        default:           return L"Bangla Keyboard — English  (Ctrl+Alt+V = Unicode, Ctrl+Alt+B = Classic)";
     }
 }
 
@@ -276,7 +277,10 @@ static LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
                         L"Bangla Unicode = standard Unicode Bangla (any Bangla font).\n"
                         L"Bangla Classic = legacy ANSI Bangla encoding (needs a legacy ANSI Bangla font).\n"
                         L"English = normal typing.\n\n"
-                        L"Switch: click the tray icon, this menu, or Ctrl+Alt+B.\n"
+                        L"Switch: this menu, click the tray icon, or shortcuts —\n"
+                        L"  Ctrl+Alt+V = Bangla Unicode (press again = English)\n"
+                        L"  Ctrl+Alt+B = Bangla Classic (press again = English)\n\n"
+                        L"All English shortcuts (Ctrl+C/V/A/S, etc.) work normally.\n"
                         L"Same fixed layout as the macOS build.\n"
                         L"MIT licensed.",
                         L"About Bangla Keyboard", MB_OK | MB_ICONINFORMATION);
@@ -285,7 +289,9 @@ static LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             }
             return 0;
         case WM_HOTKEY:
-            if (wp == HOTKEY_TOGGLE) toggleEnglish();
+            // each shortcut enables its layout, or disables it (back to English).
+            if      (wp == HOTKEY_UNICODE) setMode(g_mode == MODE_UNICODE ? MODE_ENGLISH : MODE_UNICODE);
+            else if (wp == HOTKEY_CLASSIC) setMode(g_mode == MODE_CLASSIC ? MODE_ENGLISH : MODE_CLASSIC);
             return 0;
         case WM_DESTROY:
             Shell_NotifyIconW(NIM_DELETE, &g_nid);
@@ -328,15 +334,17 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     Shell_NotifyIconW(NIM_ADD, &g_nid);
 
     g_hook = SetWindowsHookExW(WH_KEYBOARD_LL, hookProc, hInst, 0);
-    RegisterHotKey(g_hWnd, HOTKEY_TOGGLE, MOD_CONTROL | MOD_ALT, 'B');
+    RegisterHotKey(g_hWnd, HOTKEY_UNICODE, MOD_CONTROL | MOD_ALT, 'V'); // Bangla Unicode
+    RegisterHotKey(g_hWnd, HOTKEY_CLASSIC, MOD_CONTROL | MOD_ALT, 'B'); // Bangla Classic
 
-    balloon(L"Bangla Keyboard", L"In the tray. Click the icon or press Ctrl+Alt+B to type Bangla. Right-click for Bangla Unicode / Bangla Classic.");
+    balloon(L"Bangla Keyboard", L"In the tray. Ctrl+Alt+V = Bangla Unicode, Ctrl+Alt+B = Bangla Classic (press again for English). Right-click for the menu.");
 
     MSG msg;
     while (GetMessageW(&msg, nullptr, 0, 0)) { TranslateMessage(&msg); DispatchMessageW(&msg); }
 
     if (g_hook) UnhookWindowsHookEx(g_hook);
-    UnregisterHotKey(g_hWnd, HOTKEY_TOGGLE);
+    UnregisterHotKey(g_hWnd, HOTKEY_UNICODE);
+    UnregisterHotKey(g_hWnd, HOTKEY_CLASSIC);
     if (g_icoUni) DestroyIcon(g_icoUni);
     if (g_icoCls) DestroyIcon(g_icoCls);
     if (g_icoEn)  DestroyIcon(g_icoEn);
