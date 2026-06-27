@@ -1,0 +1,38 @@
+Bangla Keyboard for Windows
+===========================
+
+A free Bangla keyboard. It runs in the system tray (down by the clock) and lets
+you type Bangla in ANY app, switching from the tray or with a shortcut.
+
+SWITCHING
+  Ctrl + Alt + V     Bangla Unicode   (press again -> English)
+  Ctrl + Alt + B     Bangla Classic   (press again -> English)
+  Or left-click the tray icon, or right-click it for the menu.
+
+  The tray icon shows the mode:  green অ = Unicode,  red ক = Classic,  E = English.
+
+TYPING
+  Fixed Windows-style layout: type a prebase vowel BEFORE its consonant and it
+  reorders correctly (ে + ক -> কে). Independent vowels: f -> া, Shift+f -> অ,
+  Shift+f then f -> আ.
+
+  - Bangla Unicode works with any Bangla font (Windows has them built in).
+  - Bangla Classic outputs the legacy ANSI encoding — set your app's font to a
+    legacy ANSI Bangla font to see Bangla; otherwise it shows Latin characters.
+
+ENGLISH SHORTCUTS
+  All normal shortcuts keep working — Ctrl+C/V/X/A (copy/paste/cut/select-all),
+  Ctrl+S / Ctrl+Shift+S, Ctrl+Z/Y, Alt+F4, Alt+Tab, Win+..., arrows, etc.
+
+START WITH WINDOWS
+  Tick "Start automatically when I sign in" during install (or drop a shortcut to
+  bangla-tray.exe in shell:startup).
+
+QUIT
+  Right-click the tray icon -> Close.
+
+SmartScreen note: this build is not code-signed yet, so Windows may show
+"Windows protected your PC". Click "More info" -> "Run anyway".
+
+MIT licensed. Free & open-source. https://github.com/wpexpertinbd/bangla-keyboard
+Made by BiswasHost.

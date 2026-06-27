@@ -27,7 +27,8 @@ echo "[x64] klengine-test + enginetest + bangla-demo + bangla-tray"
 "$GXX64" -B"$B64" -std=c++17 -O2 -static -finput-charset=UTF-8 engine/klengine_test.cpp engine/klengine.cpp -o dist/klengine-test.exe
 "$GXX64" -B"$B64" -std=c++17 -O2 -static -finput-charset=UTF-8 engine/test.cpp engine/engine.cpp -o dist/enginetest.exe
 "$GXX64" -B"$B64" -std=c++17 -O2 -static -finput-charset=UTF-8 engine/demo.cpp engine/klengine.cpp -o dist/bangla-demo.exe
-"$GXX64" -B"$B64" -std=c++17 -O2 -static -mwindows -municode -finput-charset=UTF-8 tray/tray.cpp engine/klengine.cpp -o dist/bangla-tray.exe -lgdi32 -luser32 -lshell32
+"$B64/windres" tray/tray.rc -o tray/tray_res.o   # app icon + version info
+"$GXX64" -B"$B64" -std=c++17 -O2 -static -mwindows -municode -finput-charset=UTF-8 tray/tray.cpp tray/tray_res.o engine/klengine.cpp -o dist/bangla-tray.exe -lgdi32 -luser32 -lshell32
 echo "[x64] BanglaKeyboard.dll + loadtest.exe"
 "$GXX64" -B"$B64" $DLL_FLAGS $DLL_SRC -o dist/BanglaKeyboard.dll $DLL_LIBS
 "$GXX64" -B"$B64" -std=c++17 -O2 -static tsf/loadtest.cpp -o dist/loadtest.exe -lole32 -loleaut32 -luuid
