@@ -2,8 +2,10 @@
 
 > For the **macOS Claude**. The shared engine/layouts are already at parity (both
 > platforms are driven by the same macOS `.keylayout` — macOS is the source of truth).
-> What the **Windows** build now has that macOS doesn't: **free voice typing**
-> (shipped `win-v1.1.1`). This doc is how to add the *same* feature to the macOS app.
+> **Voice typing now exists on BOTH** (macOS `Bangla Voice.app`; Windows `win-v1.1.3`).
+> The remaining gap is the **punctuation + fallback refinements Windows added in
+> v1.1.2/v1.1.3** — see **§2** (the macOS app shipped the older auto-append behavior,
+> which is now superseded). §1 documents the original feature for reference.
 >
 > Release channels stay separate: **macOS = `vX.Y.Z` (one is "Latest")**, **Windows =
 > `win-vX.Y.Z`**. A Windows release must not steal "Latest" from the Mac `.pkg/.dmg`.
@@ -37,9 +39,9 @@ The headline feature to port. **Everything is free — no paid API, nothing stor
 - **Two language voice modes**, each its own hotkey + menu item (Windows:
   `Ctrl+Alt+S` Bangla, `Ctrl+Alt+D` English → on macOS use `⌃⌥S` / `⌃⌥D` or
   menu-bar items). NOT auto-detect — see the gotcha below.
-- Speak → recognized text is **inserted at the cursor in any app**. A **`।`** (Bangla)
-  or **`.`** (English) is auto-appended at the end of each utterance; English first
-  letter is capitalized.
+- Speak → recognized text is **inserted at the cursor in any app**. (⚠️ The original
+  build auto-appended a `।`/`.` per utterance — that's **superseded by §2**; do the
+  spoken-punctuation rule instead.)
 - A **menu-bar (status-item) microphone indicator shown ONLY while listening**, color
   by state — **blue = listening, green = hearing speech** — and removed when you stop.
   No on-screen window.
@@ -104,7 +106,48 @@ The headline feature to port. **Everything is free — no paid API, nothing stor
 
 ---
 
-## 2. Keep the release channels separate
+## 2. ⭐ Punctuation + reliable fallback (Windows `win-v1.1.2` / `v1.1.3`) — DO THIS
+
+The free online STT returns **no punctuation**, and free *auto*-punctuation doesn't exist
+(Google Cloud `enableAutomaticPunctuation` is paid; offline XLM-RoBERTa Bangla restorer is
+~2 GB). So Windows does what Google Docs/Gboard English voice typing does — **the user
+SPEAKS the mark** — and learned three things the macOS app should copy:
+
+### 2a. Spoken punctuation (replace the auto-append `।`/`.`)
+Map the spoken word → mark, **don't** auto-append anything on a pause:
+- Bangla : `দাঁড়ি`→`।`, `কমা`→`,`, `প্রশ্ন`→`?`, `বিস্ময়`→`!`, `সেমিকোলন`→`;`, `কোলন`→`:`
+- English: `comma`→`,`, `period`/`full stop`→`.`, `question mark`→`?`, `exclamation mark`→`!`
+- **Include misheard variants** — Google often hears `কমা` as **`কহনা`** (also `কহানা`,
+  `কম্মা`); `দাঁড়ি` as `দাড়ি`/`দাড়ী`; `প্রশ্ন` as `প্রসন`. Map them all.
+
+### 2b. Convert ONLY when the mark word is said ALONE (the key fix — `v1.1.3`)
+A mark is produced **only when the WHOLE (trimmed) utterance is exactly the command
+word** — said alone, after a pause. Anything with other words passes through verbatim, so
+a real word inside a sentence is never clobbered:
+- "আমার একটা **প্রশ্ন** আছে" (one breath) → stays text (no `?`). `দাড়ি` = *beard* stays too.
+- "তুমি কেমন আছো" → *pause* → "**প্রশ্ন**" → "তুমি কেমন আছো?"
+So **exact-match the trimmed utterance, NOT a per-token replace.** And when a standalone
+mark is injected, **backspace the trailing space** from the previous utterance so it
+attaches ("…আছি" + "।" → "…আছি।"). Trade-off (acceptable): a comma list needs a pause
+before each "কমা".
+
+### 2c. Fall back to bn-IN only on a REAL HTTP error, not on silence (`v1.1.2`)
+An empty STT result means *silence* (HTTP 200, no result) far more often than a throttle.
+Counting empties as failures made a brief pause wrongly flip Bangla to the weaker bn-IN
+recognizer. Have the STT call report a real error separately (read the **HTTP status code**;
+true only on network / 4xx / 5xx) and fall back only after N (≈3) real errors. On macOS:
+check `(response as? HTTPURLResponse)?.statusCode` in the `URLSession` completion.
+
+### Windows source to diff against
+`windows/voice/voicehost.cpp` → `applyBanglaPunct` (2a/2b) + `injectSmart` (leading-mark
+backspace); `windows/voice/voice.html` → `applyPunct` (en/bn-IN, same rule);
+`windows/voice/stt_http.h` → `googleSTT(..., bool* httpErr)` (2c, status-code check).
+
+---
+
+## 3. Keep the release channels separate
 When cutting a macOS release, keep the macOS `vX.Y.Z` tag as **Latest**. Windows ships
 under `win-vX.Y.Z` with `--latest=false`. (See the BHServe repo's `docs/WINDOWS-RELEASE.md`
-for the canonical multi-platform release flow this mirrors.)
+for the canonical multi-platform release flow this mirrors.) ⚠️ The platforms' Claudes both
+push `main` — expect non-fast-forward pushes; `git fetch` + `rebase origin/main` (the README
+platforms-table rows conflict — keep BOTH), then move the tag to the rebased commit.
