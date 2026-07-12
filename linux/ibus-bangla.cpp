@@ -134,9 +134,12 @@ static void commit_run(IBusBangla* self) {
 // while this engine is active. Mic via PulseAudio/PipeWire (libpulse-simple).
 
 static void voice_notify(const char* msg) {
-    gchar* cmd = g_strdup_printf("notify-send -t 1500 -a 'Bangla Keyboard' \"%s\"", msg);
-    g_spawn_command_line_async(cmd, nullptr);
-    g_free(cmd);
+    // Pass msg as its OWN argv element (g_spawn_async does NO shell parsing) — so it can
+    // never inject notify-send flags/args, whatever the string. All callers are literals
+    // today; this keeps it safe if a dynamic string is ever passed in.
+    const gchar* argv[] = { "notify-send", "-t", "1500", "-a", "Bangla Keyboard", msg, nullptr };
+    g_spawn_async(nullptr, (gchar**)argv, nullptr, G_SPAWN_SEARCH_PATH,
+                  nullptr, nullptr, nullptr, nullptr);
 }
 
 // Spoken punctuation: convert ONLY when the WHOLE utterance is exactly the mark word
@@ -191,25 +194,29 @@ static void voice_run(IBusBangla* self, int mode) {
     std::vector<int16_t> utter;
     bool speaking = false; int silenceMs = 0;
     const int N = 1600; int16_t buf[N];                       // 0.1 s
+    const size_t MAXSAMP = 16000 * 30;                        // 30 s hard cap (bounds memory + POST)
+    // transcribe whatever's buffered, then reset the utterance
+    auto flush = [&]() {
+        if (utter.size() > 1600) {
+            bool herr = false;
+            const char* lang = (mode == 1) ? "bn-BD" : "en-US";
+            std::string t = stt::googleSTT(utter.data(), (long)(utter.size() * 2), 16000, lang, &herr);
+            if (!t.empty()) { self->voice->fail = 0; commit_from_thread((IBusEngine*)self, apply_punct(t, mode) + " "); }
+            else if (herr && ++self->voice->fail >= 3) { self->voice->stop.store(true); }
+        }
+        utter.clear(); speaking = false; silenceMs = 0;
+    };
     while (!self->voice->stop.load()) {
         if (pa_simple_read(s, buf, sizeof(buf), &perr) < 0) break;
         double sum = 0; for (int i = 0; i < N; i++) { double v = buf[i]; sum += v * v; }
         double rms = std::sqrt(sum / N) / 32768.0;
-        if (rms > 0.012) { speaking = true; silenceMs = 0; utter.insert(utter.end(), buf, buf + N); }
-        else if (speaking) {
+        if (rms > 0.012) {
+            speaking = true; silenceMs = 0; utter.insert(utter.end(), buf, buf + N);
+            if (utter.size() >= MAXSAMP) flush();             // cap on continuous speech
+        } else if (speaking) {
             utter.insert(utter.end(), buf, buf + N);
             silenceMs += 100;
-            if (silenceMs > 700) {                            // utterance end
-                speaking = false; silenceMs = 0;
-                if (utter.size() > 1600) {
-                    bool herr = false;
-                    const char* lang = (mode == 1) ? "bn-BD" : "en-US";
-                    std::string t = stt::googleSTT(utter.data(), (long)(utter.size() * 2), 16000, lang, &herr);
-                    if (!t.empty()) { self->voice->fail = 0; commit_from_thread((IBusEngine*)self, apply_punct(t, mode) + " "); }
-                    else if (herr && ++self->voice->fail >= 3) { self->voice->stop.store(true); }
-                }
-                utter.clear();
-            }
+            if (silenceMs > 700 || utter.size() >= MAXSAMP) flush();   // utterance end (or cap)
         }
     }
     pa_simple_free(s);

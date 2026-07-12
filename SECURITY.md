@@ -141,14 +141,25 @@ the mic while a mode is on and types what you say. Audited surfaces:
 ## Linux (IBus engine)
 
 The Linux build (`linux/`, shipped as `ibus-engine-bangla`) is an IBus input-method
-engine that reuses the shared C++ `KLEngine`. There is **no voice feature** on Linux —
-it is purely a keyboard. Audit findings:
+engine that reuses the shared C++ `KLEngine`, plus an **optional voice-typing** feature
+(mic + online STT, off until you press Ctrl+Alt+S/D). Audit findings:
 
-- **No keystroke logging, storage, or transmission.** The engine only maps scan codes
-  to Bangla via **compile-time-constant tables** and commits the result through IBus.
-  Source review: **no file, network, socket, or process-exec calls** anywhere in the
-  engine (`grep` for `fopen`/`open`/`socket`/`connect`/`exec`/`popen`/`system`/`g_file`
-  → none; the only "connect"/"exec" hits are IBus API names and a comment). No telemetry.
+- **No keystroke logging, storage, or transmission.** The keyboard path only maps scan
+  codes to Bangla via **compile-time-constant tables** and commits the result through
+  IBus — no file, network, socket, or process-exec calls anywhere in the typing path.
+  No telemetry. (The only network use is the voice feature below, and only while active.)
+- **Voice typing (opt-in, off by default).** Audio is captured (PulseAudio/PipeWire) and
+  a short recognized phrase sent — **only while you are actively dictating** — over TLS
+  to the same free online speech service the Windows/macOS builds use (`stt_curl.h`,
+  native libcurl; TLS peer/host verification is libcurl-default-on, redirects are not
+  followed, and the request URL is a **hardcoded constant** with no user input → no SSRF).
+  **Nothing is recorded to disk**; the mic stream stops the moment you toggle voice off,
+  switch away from the engine, or the engine shuts down (the capture thread is joined).
+  The utterance buffer is **capped at 30 s** so continuous audio can't grow memory or the
+  POST unbounded. Recognized text is only **committed as text** (never interpreted/exec'd).
+- **No shell in the "voice on/off" toast.** `notify-send` is spawned via `g_spawn_async`
+  with an explicit `argv` (no `g_shell_parse_argv`, no `/bin/sh`), and the message is a
+  fixed literal — so no command/argument injection is possible.
 - **Runs as the user, not root, not setuid.** `ibus-daemon` launches the engine as the
   logged-in user. The binary at `/usr/lib/ibus/ibus-engine-bangla` has mode 0755 (not
   setuid/setgid), so it grants no elevated privilege.
