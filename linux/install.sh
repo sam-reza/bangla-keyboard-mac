@@ -12,7 +12,7 @@ if [ "$(id -u)" -ne 0 ]; then echo "Run with sudo: sudo ./install.sh"; exit 1; f
 
 echo "[1/4] build"
 # build as the invoking (non-root) user if possible, else here
-if [ -n "${SUDO_USER:-}" ]; then sudo -u "$SUDO_USER" ./build.sh; else ./build.sh; fi
+if [ -n "${SUDO_USER:-}" ]; then sudo -u "$SUDO_USER" bash build.sh; else bash build.sh; fi
 
 echo "[2/4] install binary + icons -> $BIN"
 install -Dm755 dist/ibus-engine-bangla "$BIN"
