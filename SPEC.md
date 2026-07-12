@@ -1,7 +1,7 @@
 # Bangla Keyboard — Cross-platform Engine Specification
 
 This is the **single source of truth** for the typing behaviour on every OS.
-macOS ships today; Windows and Linux ports must reproduce *exactly* this behaviour.
+All three ports (macOS, Windows, Linux) ship today and reproduce *exactly* this behaviour.
 
 The reference implementation is [`engine/Engine.swift`](engine/Engine.swift) — 172 lines,
 verified on the real macOS `UCKeyTranslate` engine and on a standalone test harness
@@ -24,13 +24,14 @@ This reordering is the entire value of the product. A plain static layout (Windo
 
 | OS | Mechanism | Status |
 |----|-----------|--------|
-| macOS | Static `.keylayout` emulating the engine via chained deadkeys (shipping) **+** an optional IMK IME (blocked by Apple notarization) | ✅ shipping |
-| Windows | **TSF text service** (Text Services Framework) implementing this engine | ⬜ to build |
-| Linux | **IBus** (and/or Fcitx5) engine implementing this engine | ⬜ later |
+| macOS | Static `.keylayout` emulating the engine via chained deadkeys (**+** an optional IMK IME, blocked by Apple notarization) | ✅ shipping (`v1.6.2`) |
+| Windows | **Tray app** with a global low-level keyboard hook running the C++ **KLEngine** (an experimental TSF text service also exists, unshipped) | ✅ shipping (`win-v1.1.3`) |
+| Linux | **IBus** engine running the same C++ **KLEngine** | ✅ shipping (`linux-v1.1.1`) |
 
-> A Windows `.klc` layout is **not** acceptable as the primary deliverable: it would lose
-> reph / matra reordering. Build a TSF IME. (A `.klc` MAY ship as a "basic" fallback, clearly
-> labelled, but the IME is the real port.)
+> A plain static layout (Windows `.klc` / bare XKB) **cannot** do the reph/matra reordering —
+> so each OS runs the stateful engine instead: macOS via chained-deadkey `.keylayout`, Windows
+> via a global-hook tray app, Linux via an IBus preedit engine. (A Windows TSF IME is the
+> "proper" long-term shell but the tray app already delivers full reordering today.)
 
 ---
 
@@ -270,7 +271,7 @@ file (see §9).
 - Reuse `windows/` for the VS solution; keep the engine in its own static lib/`.cpp` so it
   can be unit-tested headless.
 
-### Linux (IBus, later)
+### Linux (IBus) — shipping
 - Implement an `IBusEngine` subclass; the engine maps cleanly to
   `update_preedit_text` / `commit_text`. Package as an IBus component + `.xml`.
 - Bind by keysym for the US-QWERTY positions. Fcitx5 addon optional, same engine.
