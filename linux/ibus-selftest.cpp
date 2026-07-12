@@ -32,11 +32,11 @@ static guint scanOf(char c) {
 }
 static void spin(int ms) { for (int i = 0; i < ms / 5; i++) { while (g_main_context_iteration(nullptr, FALSE)); g_usleep(5000); } }
 
-static void sendKey(IBusInputContext* ctx, guint scan, gboolean shift) {
-    guint keycode = scan + 8;                       // X11 keycode
+// The engine maps by keyval now (US layout), so feed the character as the keyval.
+static void sendKey(IBusInputContext* ctx, guint keyval, gboolean shift) {
     guint state = shift ? IBUS_SHIFT_MASK : 0;
-    ibus_input_context_process_key_event(ctx, IBUS_KEY_a, keycode, state);            // press
-    ibus_input_context_process_key_event(ctx, IBUS_KEY_a, keycode, state | IBUS_RELEASE_MASK); // release
+    ibus_input_context_process_key_event(ctx, keyval, 0, state);                       // press
+    ibus_input_context_process_key_event(ctx, keyval, 0, state | IBUS_RELEASE_MASK);   // release
     spin(60);
 }
 
@@ -44,10 +44,10 @@ static void sendKey(IBusInputContext* ctx, guint scan, gboolean shift) {
 static std::string play(IBusInputContext* ctx, const char* spec) {
     g_commit.clear();
     std::string tok;
-    auto go = [&](const std::string& t){ if(t.empty())return; bool sh=t[0]=='^'; char k=sh?t[1]:t[0]; sendKey(ctx, scanOf(k), sh); };
+    auto go = [&](const std::string& t){ if(t.empty())return; bool sh=t[0]=='^'; char k=sh?t[1]:t[0]; sendKey(ctx, (guint)(unsigned char)k, sh); };
     for (const char* p = spec; *p; ++p) { if (*p==' '){ go(tok); tok.clear(); } else tok += *p; }
     go(tok);
-    sendKey(ctx, scanOf(' ') ? scanOf(' ') : 0x39, FALSE);   // Space (0x39) -> commit the run
+    sendKey(ctx, ' ', FALSE);                                // Space -> commit the run
     spin(80);
     return g_commit;
 }

@@ -8,9 +8,12 @@
 // syllable run lives in the PREEDIT (underlined); process() appends, peek() shows
 // the pending deadkey, and it commits on a word boundary / chord / focus-out.
 //
-// Physical-key note: a Linux evdev keycode EQUALS the Windows Set-1 scan code the
-// tables are keyed by (both derive from the IBM PC/AT set), and IBus passes the
-// X11 keycode = evdev + 8 — so scan = keycode - 8, no lookup table needed.
+// Key mapping: we drive the tables by Windows Set-1 scan code, and derive it from
+// the IBus KEYVAL (the engine declares layout "us", so the keyval is always the
+// US-QWERTY character for that physical key). This is robust across X11 AND Wayland
+// (the raw `keycode` is the X11 keycode = evdev+8 on X11 but the bare evdev keycode
+// on GNOME Wayland — an 8-key shift — so keycode is NOT reliable). Non-character
+// keys (Backspace/Enter/arrows) map to scan 0 and correctly pass through.
 //
 // Build: see build.sh (g++ + `pkg-config --cflags --libs ibus-1.0`).
 #include <ibus.h>
@@ -29,6 +32,40 @@ G_DEFINE_TYPE(IBusBangla, ibus_bangla, IBUS_TYPE_ENGINE)
 
 static gchar* u16utf8(const std::u16string& s) {
     return g_utf16_to_utf8((const gunichar2*)s.data(), (glong)s.size(), nullptr, nullptr, nullptr);
+}
+
+// US-QWERTY keyval (shifted OR unshifted) -> Windows Set-1 scan code of that physical
+// key. Shift is taken from the modifier state, so both cases map to the same scan.
+// Returns 0 for non-layout keys (Space/Backspace/Enter/arrows/…) -> pass through.
+static unsigned scanFromKeyval(guint kv) {
+    switch (kv) {
+        case '`': case '~': return 0x29;
+        case '1': case '!': return 0x02; case '2': case '@': return 0x03;
+        case '3': case '#': return 0x04; case '4': case '$': return 0x05;
+        case '5': case '%': return 0x06; case '6': case '^': return 0x07;
+        case '7': case '&': return 0x08; case '8': case '*': return 0x09;
+        case '9': case '(': return 0x0A; case '0': case ')': return 0x0B;
+        case '-': case '_': return 0x0C; case '=': case '+': return 0x0D;
+        case 'q': case 'Q': return 0x10; case 'w': case 'W': return 0x11;
+        case 'e': case 'E': return 0x12; case 'r': case 'R': return 0x13;
+        case 't': case 'T': return 0x14; case 'y': case 'Y': return 0x15;
+        case 'u': case 'U': return 0x16; case 'i': case 'I': return 0x17;
+        case 'o': case 'O': return 0x18; case 'p': case 'P': return 0x19;
+        case '[': case '{': return 0x1A; case ']': case '}': return 0x1B;
+        case '\\': case '|': return 0x2B;
+        case 'a': case 'A': return 0x1E; case 's': case 'S': return 0x1F;
+        case 'd': case 'D': return 0x20; case 'f': case 'F': return 0x21;
+        case 'g': case 'G': return 0x22; case 'h': case 'H': return 0x23;
+        case 'j': case 'J': return 0x24; case 'k': case 'K': return 0x25;
+        case 'l': case 'L': return 0x26; case ';': case ':': return 0x27;
+        case '\'': case '"': return 0x28;
+        case 'z': case 'Z': return 0x2C; case 'x': case 'X': return 0x2D;
+        case 'c': case 'C': return 0x2E; case 'v': case 'V': return 0x2F;
+        case 'b': case 'B': return 0x30; case 'n': case 'N': return 0x31;
+        case 'm': case 'M': return 0x32; case ',': case '<': return 0x33;
+        case '.': case '>': return 0x34; case '/': case '?': return 0x35;
+        default: return 0;
+    }
 }
 
 // Pick the table from the engine's own name the first time it's used.
@@ -82,9 +119,8 @@ static gboolean ibus_bangla_process_key_event(IBusEngine* engine, guint keyval, 
         // Let Ctrl / Alt / Super chords (copy/paste/save/etc.) pass through untouched.
         if (state & (IBUS_CONTROL_MASK | IBUS_MOD1_MASK | IBUS_MOD4_MASK)) { commit_run(self); return FALSE; }
         bool shift = (state & IBUS_SHIFT_MASK) != 0;
-        unsigned scan = keycode - 8;                          // evdev == Windows Set-1 scancode
-                                                              // (scan>0xFF is rejected inside KLEngine)
-        if (self->eng->wouldHandle(scan)) {
+        unsigned scan = scanFromKeyval(keyval);               // US keyval -> Set-1 scancode (X11+Wayland safe)
+        if (scan && self->eng->wouldHandle(scan)) {
             if (self->run->size() > 1024) commit_run(self);   // bound the in-progress run (stuck key / no boundary)
             *self->run += self->eng->process(scan, shift);    // append to the live run
             show_preedit(self);                               // preedit = run + peek()
