@@ -16,7 +16,7 @@
 |----|-----------|--------|--------|
 | 🍎 **macOS** | Native `.keylayout` (Unicode + Classic) + smart installer `.pkg`/`.dmg`; **voice typing** companion app (spoken punctuation) | ✅ **shipping** | [`macos/`](macos/) |
 | 🪟 **Windows** | Tray app (Bangla Unicode + Classic + **voice typing**) running the shared engine, + a TSF IME | ✅ **v1.1.3** | [`windows/`](windows/) |
-| 🐧 **Linux** | IBus / Fcitx5 engine running the shared engine | ⬜ planned | [`linux/`](linux/) |
+| 🐧 **Linux** | IBus engine (Bangla Unicode + Classic) running the shared engine | ✅ **working** (Debian/Ubuntu + any IBus distro) | [`linux/`](linux/) |
 
 **macOS users:** grab the latest `.pkg`/`.dmg` from the [**latest release**](https://github.com/wpexpertinbd/bangla-keyboard/releases/latest) and see
 [`macos/README.md`](macos/README.md).
