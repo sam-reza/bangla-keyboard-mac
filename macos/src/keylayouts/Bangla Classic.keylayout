@@ -1,7 +1,7 @@
 <?XML version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard PUBLIC "" "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
 <!--Last edited by Ukelele version 2.2.3 on 2012-11-15 at 17:12 (BDT)-->
-<keyboard group="126" id="-19014" name="Bangla Classic" maxout="3">
+<keyboard group="126" id="-19015" name="Bangla Classic" maxout="3">
     <layouts>
         <layout first="0" last="17" modifiers="Modifiers" mapSet="ANSI"/>
         <layout first="18" last="18" modifiers="Modifiers" mapSet="JIS"/>
@@ -134,6 +134,22 @@
             <key code="126" output="&#x001E;"/>
         </keyMap>
         <keyMap index="1">
+            <key code="65" output="."/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="75" output="/"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
             <key code="0" action="ref"/>
             <key code="1" action="dru-kar"/>
             <key code="2" action="dhree-kar"/>
@@ -222,6 +238,22 @@
             <key code="126" output="&#x001E;"/>
         </keyMap>
         <keyMap index="2">
+            <key code="65" output="."/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="75" output="/"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
             <key code="0" action="a"/>
             <key code="1" action="s"/>
             <key code="2" action="d"/>
@@ -310,6 +342,22 @@
             <key code="126" output="&#x001E;"/>
         </keyMap>
         <keyMap index="3">
+            <key code="65" output="."/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="75" output="/"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
             <key code="0" output=""/>
             <key code="36" output="&#x000D;"/>
             <key code="48" output="&#x0009;"/>
@@ -352,6 +400,22 @@
             <key code="126" output="&#x001E;"/>
         </keyMap>
         <keyMap index="4">
+            <key code="65" output="."/>
+            <key code="67" output="*"/>
+            <key code="69" output="+"/>
+            <key code="75" output="/"/>
+            <key code="78" output="-"/>
+            <key code="81" output="="/>
+            <key code="82" output="0"/>
+            <key code="83" output="1"/>
+            <key code="84" output="2"/>
+            <key code="85" output="3"/>
+            <key code="86" output="4"/>
+            <key code="87" output="5"/>
+            <key code="88" output="6"/>
+            <key code="89" output="7"/>
+            <key code="91" output="8"/>
+            <key code="92" output="9"/>
             <key code="0" action="A"/>
             <key code="1" action="S"/>
             <key code="2" action="D"/>
@@ -440,6 +504,22 @@
             <key code="126" output="&#x001E;"/>
         </keyMap>
     <keyMap index="5">
+        <key code="65" output="."/>
+        <key code="67" output="*"/>
+        <key code="69" output="+"/>
+        <key code="75" output="/"/>
+        <key code="78" output="-"/>
+        <key code="81" output="="/>
+        <key code="82" output="0"/>
+        <key code="83" output="1"/>
+        <key code="84" output="2"/>
+        <key code="85" output="3"/>
+        <key code="86" output="4"/>
+        <key code="87" output="5"/>
+        <key code="88" output="6"/>
+        <key code="89" output="7"/>
+        <key code="91" output="8"/>
+        <key code="92" output="9"/>
       <key code="0" output="a"/>
       <key code="1" output="s"/>
       <key code="2" output="d"/>
@@ -490,6 +570,22 @@
       <key code="50" output="`"/>
     </keyMap>
       <keyMap index="6">
+          <key code="65" output="."/>
+          <key code="67" output="*"/>
+          <key code="69" output="+"/>
+          <key code="75" output="/"/>
+          <key code="78" output="-"/>
+          <key code="81" output="="/>
+          <key code="82" output="0"/>
+          <key code="83" output="1"/>
+          <key code="84" output="2"/>
+          <key code="85" output="3"/>
+          <key code="86" output="4"/>
+          <key code="87" output="5"/>
+          <key code="88" output="6"/>
+          <key code="89" output="7"/>
+          <key code="91" output="8"/>
+          <key code="92" output="9"/>
       <key code="0" output="A"/>
       <key code="1" output="S"/>
       <key code="2" output="D"/>
@@ -557,6 +653,22 @@
             <key code="512" output=""/>
         </keyMap>
     <keyMap index="5">
+        <key code="65" output="."/>
+        <key code="67" output="*"/>
+        <key code="69" output="+"/>
+        <key code="75" output="/"/>
+        <key code="78" output="-"/>
+        <key code="81" output="="/>
+        <key code="82" output="0"/>
+        <key code="83" output="1"/>
+        <key code="84" output="2"/>
+        <key code="85" output="3"/>
+        <key code="86" output="4"/>
+        <key code="87" output="5"/>
+        <key code="88" output="6"/>
+        <key code="89" output="7"/>
+        <key code="91" output="8"/>
+        <key code="92" output="9"/>
       <key code="0" output="a"/>
       <key code="1" output="s"/>
       <key code="2" output="d"/>
@@ -607,6 +719,22 @@
       <key code="50" output="`"/>
     </keyMap>
       <keyMap index="6">
+          <key code="65" output="."/>
+          <key code="67" output="*"/>
+          <key code="69" output="+"/>
+          <key code="75" output="/"/>
+          <key code="78" output="-"/>
+          <key code="81" output="="/>
+          <key code="82" output="0"/>
+          <key code="83" output="1"/>
+          <key code="84" output="2"/>
+          <key code="85" output="3"/>
+          <key code="86" output="4"/>
+          <key code="87" output="5"/>
+          <key code="88" output="6"/>
+          <key code="89" output="7"/>
+          <key code="91" output="8"/>
+          <key code="92" output="9"/>
       <key code="0" output="A"/>
       <key code="1" output="S"/>
       <key code="2" output="D"/>
