@@ -33,6 +33,22 @@
 > `engine/Engine.swift` per the macOS `.keylayout` ground truth. See
 > [`engine/README.md`](engine/README.md).
 
+## Install & use (end users)
+1. Download **`BanglaKeyboard-Setup-*.exe`** from the
+   [**releases page**](https://github.com/wpexpertinbd/bangla-keyboard/releases) and run it —
+   **per-user, no admin needed**. It's unsigned, so SmartScreen shows a warning → **More info →
+   Run anyway**. It installs the tray app (+ free Bangla Unicode fonts) and can start at login.
+2. A **tray icon** appears. Click it to switch **Bangla Unicode / Bangla Classic / English**
+   (or toggle with **Ctrl+Alt+B**), then type in any app — a prebase vowel typed *before* its
+   consonant reorders (`ে`+`ক`→`কে`, `ভ া স র্ ন`→`ভার্সন`).
+3. **Voice typing** (opt-in during install): **Ctrl+Alt+S** = Bangla, **Ctrl+Alt+D** = English.
+   Free, nothing stored; speak the punctuation ("দাঁড়ি"→।, "কমা"→,, "প্রশ্ন"→?). Needs a mic + internet.
+
+**Bangla Classic** needs a legacy ANSI ("MJ"-style) font (not included); **Bangla Unicode**
+works with any Unicode Bangla font (the installer bundles several).
+
+> The rest of this page is for developers / porters.
+
 ## Read first
 1. [`../SPEC.md`](../SPEC.md) — the complete, OS-neutral engine spec (keymap + algorithm +
    test corpus). **This is the contract.** Your build must reproduce it exactly.

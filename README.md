@@ -16,10 +16,34 @@
 |----|-----------|--------|--------|
 | 🍎 **macOS** | Native `.keylayout` (Unicode + Classic) + smart installer `.pkg`/`.dmg`; **voice typing** companion app (spoken punctuation) | ✅ **shipping** | [`macos/`](macos/) |
 | 🪟 **Windows** | Tray app (Bangla Unicode + Classic + **voice typing**) running the shared engine, + a TSF IME | ✅ **v1.1.3** | [`windows/`](windows/) |
-| 🐧 **Linux** | IBus engine (Bangla Unicode + Classic) running the shared engine | ✅ **working** (Debian/Ubuntu + any IBus distro) | [`linux/`](linux/) |
+| 🐧 **Linux** | IBus engine (Bangla Unicode + Classic + **voice typing**) running the shared engine | ✅ **v1.1.0** (Debian/Ubuntu + any IBus distro) | [`linux/`](linux/) |
 
-**macOS users:** grab the latest `.pkg`/`.dmg` from the [**latest release**](https://github.com/wpexpertinbd/bangla-keyboard/releases/latest) and see
-[`macos/README.md`](macos/README.md).
+## Install & use
+
+Grab your platform's build from the [**releases page**](https://github.com/wpexpertinbd/bangla-keyboard/releases), then:
+
+### 🍎 macOS
+1. Download **`Bangla Keyboard.pkg`** from the [latest release](https://github.com/wpexpertinbd/bangla-keyboard/releases/latest) → **right-click → Open** (unsigned build).
+2. Log out/in, then **System Settings → Keyboard → Text Input → Edit → `+` → Bangla** → add **Bangla Unicode** (and/or **Classic**). Switch with **⌃Space**.
+3. **Voice** (optional): download **`Bangla-Voice-macOS-*.zip`**, open the app, allow Accessibility → **⌃⌥S** Bangla · **⌃⌥D** English.
+
+More: [`macos/README.md`](macos/README.md).
+
+### 🪟 Windows
+1. Download **`BanglaKeyboard-Setup-*.exe`** (Windows release) from the [releases page](https://github.com/wpexpertinbd/bangla-keyboard/releases) → run it (**per-user, no admin**; SmartScreen → *More info → Run anyway*).
+2. A **tray icon** appears — pick **Bangla Unicode / Classic / English** (or **Ctrl+Alt+B**). Type in any app.
+3. **Voice** (opt-in at install): **Ctrl+Alt+S** Bangla · **Ctrl+Alt+D** English.
+
+More: [`windows/README.md`](windows/README.md).
+
+### 🐧 Linux (Debian / Ubuntu + any IBus distro)
+1. Download **`bangla-keyboard-ibus_*.deb`** (Linux release) from the [releases page](https://github.com/wpexpertinbd/bangla-keyboard/releases): `sudo apt install ./bangla-keyboard-ibus_*.deb`  (other distros: `cd linux && ./build.sh && sudo ./install.sh`).
+2. Log out/in, then **Settings → Keyboard → Input Sources → `+` → Bangla → Bangla (Unicode)** (and/or **Classic**). Switch with **Super+Space**.
+3. **Voice**: **Ctrl+Alt+S** Bangla · **Ctrl+Alt+D** English.
+
+More: [`linux/README.md`](linux/README.md).
+
+> **Typing:** type a prebase vowel *before* its consonant and it reorders (`ে`+`ক`→`কে`, `ভ া স র্ ন`→`ভার্সন`). **Voice** needs a microphone + internet, is **free with nothing stored**, and you **speak the punctuation** — say the mark alone after a pause: "দাঁড়ি"→। , "কমা"→, , "প্রশ্ন"→? , "বিস্ময়"→!. **Bangla Classic** needs a legacy ANSI ("MJ"-style) font, not included; **Bangla Unicode** works with any Unicode Bangla font.
 
 ## How it works — one engine, three thin shells
 
@@ -43,7 +67,7 @@ three platforms share **one engine** and wrap it in a thin OS-specific shell:
 ├── engine/          # canonical reference engine (Engine.swift) + notes
 ├── macos/           # shipping macOS build (.keylayout + installer)
 ├── windows/         # Windows tray app + voice typing (+ experimental TSF IME)
-├── linux/           # Linux IBus/Fcitx engine (planned)
+├── linux/           # Linux IBus engine (Unicode + Classic + voice)
 ├── LICENSE          # MIT
 ├── DISCLAIMER.md    # not affiliated with any commercial keyboard/font vendor
 └── SECURITY.md

@@ -74,6 +74,24 @@ xattr -dr com.apple.quarantine ~/Desktop/"Bangla Keyboard Installer.app"
 …and open it. (This warning goes away entirely only with a notarized build,
 which needs a paid Apple Developer ID.)
 
+## 🎤 Voice typing (optional)
+
+A small **menu-bar companion** (`Bangla Voice.app`) lets you dictate instead of type.
+Download **`Bangla-Voice-macOS-*.zip`** from the
+[**latest release**](https://github.com/wpexpertinbd/bangla-keyboard/releases/latest),
+unzip, and open the app (unsigned → **right-click → Open**, or *Open Anyway* in
+**System Settings → Privacy & Security**). The first time, allow **Accessibility**
+(Privacy & Security → Accessibility) so it can type at the cursor.
+
+- **⌃⌥S** = Bangla voice · **⌃⌥D** = English voice · press again (or the menu) to stop.
+- **Free, nothing stored** — correct Bangladeshi **bn-BD** + English via a free online
+  speech service; the mic is live only while listening.
+- **Punctuation is spoken** (say the mark alone after a pause): "দাঁড়ি"→। , "কমা"→, ,
+  "প্রশ্ন"→? , "বিস্ময়"→! (English: "full stop" / "comma" / "question mark"). A word
+  inside a sentence stays a word.
+- Needs a microphone + internet. Details + privacy: [`voice/README.md`](voice/README.md)
+  and [`../SECURITY.md`](../SECURITY.md).
+
 ## ⚠️ About the Bangla Classic layout (legacy ANSI fonts)
 
 The **Bangla Classic** layout outputs the **legacy ASCII (non-Unicode)**
