@@ -32,7 +32,6 @@ cat > "$XML" <<EOF
   <license>MIT</license>
   <homepage>https://github.com/wpexpertinbd/bangla-keyboard</homepage>
   <textdomain>ibus-bangla</textdomain>
-  <icon>/usr/share/ibus/icons/bangla-unicode.png</icon>
   <engines>
     <engine>
       <name>bangla-unicode</name>
