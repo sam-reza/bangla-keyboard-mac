@@ -28,7 +28,16 @@ sudo apt install build-essential pkg-config libibus-1.0-dev ibus   # Debian/Ubun
 # Arch:    sudo pacman -S base-devel ibus
 ```
 
-## Build & install
+## Install — Debian / Ubuntu (`.deb`, easiest)
+Download `bangla-keyboard-ibus_<ver>_amd64.deb` from the
+[**latest release**](https://github.com/wpexpertinbd/bangla-keyboard/releases), then:
+```sh
+sudo apt install ./bangla-keyboard-ibus_*.deb   # pulls in ibus if needed
+```
+**Log out and back in** (GNOME reads new IBus engines at login), then add the input
+source (below). Build your own `.deb` with `./build-deb.sh`.
+
+## Build & install from source (any IBus distro)
 ```sh
 cd linux
 ./build.sh              # -> linux/dist/ibus-engine-bangla (+ self-test 20/20, 12/12)
